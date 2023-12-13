@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "name": "C#: BaiTap-phan3 [http]",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}\\BaiTap-phan3.csproj",
+            "launchConfigurationId": "TargetFramework=;http"
+        }
+    ]
+}

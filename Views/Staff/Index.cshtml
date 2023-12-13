@@ -1,0 +1,140 @@
+@using BaiTap_phan3.Function;
+@using BaiTap_phan3.Models;
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+@{
+
+    //loading...
+    <div class="loader"></div>
+
+    // Thanh tìm kiếm
+    <div class="container-fluid d-flex align-items-center justify-content-center p-4" style="height: 100px;">
+        <input class="form-control-sm" id="searchInput" type="search" style="width: 60%; height: 100%; font-size: large">
+        <button class="btn bg-warning mx-4" id="searchButton" style="height: 90%" onclick="TimKiem()">Tìm kiếm</button>
+    </div>
+
+    // Nút pupup thêm nhân viên
+    <div class="">
+        <button class="btn btn-secondary ml-3 mb-3" data-toggle="modal" data-target="#container-staff-form" onclick="(function(){SelectedMaNhanVien=''})();">Thêm nhân viên</button>
+    </div>
+
+    <div class="container Staff">
+        <!--bảng thông tin nhân viên-->
+        <table class="table table-hover staff-table">
+            <thead class="">
+                <tr>
+                    <th>Mã NV</th>
+                    <th>Họ và tên</th>
+                    <th>Ngày sinh</th>
+                    <th>SDT</th>
+                    <th>Chức vụ</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    //string keyword = context.HttpContext.Request.Query["keyword"];
+                    // get value keyword of search Class in here
+                    Dictionary<string, NhanVien> nhanVienDictionary = CenterTool.GetDanhSachNhanVien();
+                    foreach (KeyValuePair<string, NhanVien> item in nhanVienDictionary)
+                    {
+                        <tr class="data" id="@item.Key">
+                            <td>@item.Key</td>
+                            <td class="hoten">@item.Value.HoVaTen</td>
+                            <td class="ngaysinh">@item.Value.NgayThangNamSinh.ToString("dd-MM-yyyy")</td>
+                            <td>@item.Value.SoDienThoai</td>
+                            <td>@item.Value.ChucVu</td>
+                            <td class="btn-area">
+                                <button class="btn text-light bg-danger m-1 edit-staff-btn" data-toggle="modal" data-target="#container-staff-form"
+                                    onclick="GiuMaNhanVien('@item.Key')">Sửa</button>
+                                <button class="btn bg-warning m-1" data-toggle="modal" data-target="#removeStaff"
+                                    onclick="GiuMaNhanVien('@item.Key')">Xóa</button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <!--modal them nhan vien-->
+        <div class="modal fade" id="container-staff-form" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-header">Thêm nhân viên</h4>
+                        <button class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <div class="modal-body container">
+                        <form class="container bg-light px-0 form" id="staff-form" name="staff-form"
+                            style="max-width: 500px;" autocomplete="off">
+
+                            <div class="form-group mb-3">
+                                <label for="name">Họ và tên:</label>
+                                <input type="text" placeholder="Họ và tên*" id="HoVaTen" name="HoVaTen" autofocus
+                                    class="form-control" onchange="validateName()">
+                                <span id="NameError">*Họ tên không để chống</span>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="birth">Ngày tháng năm sinh:</label>
+                                <input type="date" id="DOB" name="NgayThangNamSinh" class="form-control"
+                                    max='@DateTime.Now.ToString("yyyy-MM-dd")' min="1900-01-01" onchange="validateDob()">
+                                <span id="DobError">*Ngày sinh không hợp lệ, nhân viên chưa đủ tuổi đi làm</span>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="sdt">Số điện thoại:</label>
+                                <input inputmode="tel" id="SoDienThoai" name="SoDienThoai" type="tel"
+                                    placeholder="Số điện thoại" class="form-control">
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="ChuVu">Chức vụ:</label>
+                                <input type="text" placeholder="Chức vụ" id="ChucVu" name="ChucVu" class="form-control">
+                            </div>
+                            <span id="error-staff-form" class="FormError"></span>
+                        </form>
+
+                    </div>
+
+                    <div class="row px-3 pb-3 mt-4">
+                        <div class="col">
+                            <button class="btn btn-primary container-fluid" id="createBtn">Lưu</button>
+                        </div>
+
+                        <div class="col">
+                            <button class=" btn btn-primary container-fluid" data-dismiss="modal">Hủy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--modal-poppup xoa nhan vien-->
+        <div class="modal fade" id="removeStaff" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <!--header-->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Xác nhận xóa nhân viên</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <!--body--->
+                    <div class="modal-body">Bạn có thật muốn xóa nhân viên này</div>
+
+                    <!--footer-->
+                    <div class="modal-footer">
+                        <button class="btn btn-danger" data-dismiss="modal" id="XoaButton">Xóa</button>
+                        <button class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+}
