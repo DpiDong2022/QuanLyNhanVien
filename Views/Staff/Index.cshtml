@@ -8,7 +8,7 @@
 @{
 
     //loading...
-    <div class="loader"></div>
+    <div class="loading loader--hidden"></div>
 
     // Thanh tìm kiếm
     <div class="container-fluid d-flex align-items-center justify-content-center p-4" style="height: 100px;">
@@ -18,7 +18,7 @@
 
     // Nút pupup thêm nhân viên
     <div class="">
-        <button class="btn btn-secondary ml-3 mb-3" data-toggle="modal" data-target="#container-staff-form" onclick="(function(){SelectedMaNhanVien=''})();">Thêm nhân viên</button>
+        <button class="btn btn-secondary ml-3 mb-3" id="open-staff-form-btn" data-toggle="modal" data-target="#container-staff-form" onclick="(function(){SelectedMaNhanVien=''})();">Thêm nhân viên</button>
     </div>
 
     <div class="container Staff">

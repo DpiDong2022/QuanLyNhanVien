@@ -104,8 +104,6 @@ function isStaffExist() {
         name = $(row).children(".hoten").text().toLowerCase();
         date = $(row).children(".ngaysinh").text();
         maNV = $(row).children("td:nth-child(1)").text();
-        console.log(name);
-        console.log(date);
         if (name == currentName && DobFormated == date && maNV != SelectedMaNhanVien) {
             return true;
         }
@@ -141,40 +139,38 @@ function callCreateStaff() {
     };
 
     $.ajax(options).done(function (result) {
+        $(".loading").addClass("loader");
+        $(".loading").removeClass("loader--hidden");
+
+        setTimeout(() => {
+            $(".loading").addClass("loader--hidden");
+        }, 750);
+
+
         if (result.success) {
-            $(".loader").show();
-            setTimeout(() => {
-                $(".loader").hide();
+            var newRow = "<tr class='data' id='" + result.data + "'>" +
+                "<td>" + result.data + "</td>" +
+                "<td class='hoten'>" + hoTen + "</td>" +
+                "<td class='ngaysinh'>" + DobFormated + "</td>" +
+                "<td>" + Sdt + "</td>" +
+                "<td>" + chucVu + "</td>" +
+                "<td class='btn-area'>" +
+                "<button class ='btn text-light bg-danger m-1 edit-staff-btn' data-toggle='modal' data-target='#container-staff-form'" +
+                "onclick='GiuMaNhanVien(`" + result.data + "`)'>Sửa</button>" +
+                "<button class='btn bg-warning m-1' data-toggle='modal' data-target='#removeStaff'" +
+                "onclick='GiuMaNhanVien(`" + result.data + "`)'>Xóa</button>" +
+                "</td>" +
+                "</tr>";
 
-                var newRow = "<tr class='data' id='" + result.data + "' style='border: 4px solid red;'>" +
-                    "<td>" + result.data + "</td>" +
-                    "<td class='hoten'>" + hoTen + "</td>" +
-                    "<td class='ngaysinh'>" + DobFormated + "</td>" +
-                    "<td>" + Sdt + "</td>" +
-                    "<td>" + chucVu + "</td>" +
-                    "<td class='btn-area'>" +
-                    "<button class ='btn text-light bg-danger m-1 edit-staff-btn' data-toggle='modal' data-target='#container-staff-form'" +
-                    "onclick='GiuMaNhanVien(`" + result.data + "`)'>Sửa</button>" +
-                    "<button class='btn bg-warning m-1' data-toggle='modal' data-target='#removeStaff'" +
-                    "onclick='GiuMaNhanVien(`" + result.data + "`)'>Xóa</button>" +
-                    "</td>" +
-                    "</tr>";
+            if (SelectedMaNhanVien === "" || SelectedMaNhanVien === null) {
 
-                if (SelectedMaNhanVien === "" || SelectedMaNhanVien === null) {
+                $(".staff-table").children("tbody").prepend(newRow);
+            } else {
+                $("#" + SelectedMaNhanVien).replaceWith(newRow);
+            }
+            $(".edit-staff-btn").click(fillStaffForm);
 
-                    $(".staff-table").children("tbody").prepend(newRow);
-                } else {
-                    $("#" + SelectedMaNhanVien).replaceWith(newRow);
-                }
-                $(".edit-staff-btn").click(fillStaffForm);
-
-                $(".close").click();
-
-                setTimeout(function () {
-                    $("#" + result.data).css("border", "");
-
-                }, 1000);
-            }, 1000);
+            $(".close").click();
 
         } else {
             alert("Nhan Vien da ton tai");
@@ -241,3 +237,26 @@ function TimKiem() {
         }
     });
 }
+
+
+
+
+let index = 0
+function OpenStaff() {
+    const password = $("#pass").val();
+    const confirm_password = $("#cpass").val();
+
+    if (password == "" || confirm_password == "") return
+
+    if (password == confirm_password) {
+        window.open("Index", "_blank")
+    }
+}
+
+$(document).ready(function () {
+    $("#createBtn").click(function () {
+        if ($("#container-staff-form").attr("display") == "none") {
+
+        }
+    })
+});

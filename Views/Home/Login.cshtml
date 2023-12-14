@@ -1,0 +1,21 @@
+@{
+    ViewData["Title"] = "Login Page";
+}
+
+<div class="container" style="width: 50%;">
+    <form id="login-form" action="">
+        <div class="form-group mb-3">
+            <label for="user-name">User name:</label>
+            <input type="text" id="user-name" name="user-name" class="form-control">
+        </div>
+        <div class="form-group mb-3">
+            <label for="pass">Password:</label>
+            <input type="text" id="pass" name="pass" class="form-control" required>
+        </div>
+        <div class="form-group mb-3">
+            <label for="cpass">Confirm Password:</label>
+            <input type="text" id="cpass" name="cpass" class="form-control" required>
+        </div>
+    </form>
+    <button id="submit-login-btn" class="btn btn-primary" onclick="OpenStaff()">Submit</button>
+</div>
