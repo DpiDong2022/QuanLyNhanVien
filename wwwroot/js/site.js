@@ -3,6 +3,17 @@
 // Write your JavaScript code.
 let SelectedMaNhanVien;
 
+$(document).ready(function(){
+    let options = {};
+    options.url = "Staff/List";
+    options.type = "get";
+    options.textContent = "application/json";
+
+    $.ajax(options).done(function(result){
+        console.log(result);
+    });
+});
+
 function validateDob() {
     const dateOfBirth = String($("#DOB").val());
     const currentYear = new Date().getFullYear();
@@ -71,7 +82,6 @@ $(document).ready(function () {
 
 $(document).ready(function () {
     $("#createBtn").click(function () {
-        debugger;
         if (validateDob() & validateName()) {
 
             if (isStaffExist()) {
@@ -139,38 +149,44 @@ function callCreateStaff() {
     };
 
     $.ajax(options).done(function (result) {
-        $(".loading").addClass("loader");
-        $(".loading").removeClass("loader--hidden");
-
-        setTimeout(() => {
-            $(".loading").addClass("loader--hidden");
-        }, 750);
-
-
         if (result.success) {
-            var newRow = "<tr class='data' id='" + result.data + "'>" +
-                "<td>" + result.data + "</td>" +
-                "<td class='hoten'>" + hoTen + "</td>" +
-                "<td class='ngaysinh'>" + DobFormated + "</td>" +
-                "<td>" + Sdt + "</td>" +
-                "<td>" + chucVu + "</td>" +
-                "<td class='btn-area'>" +
-                "<button class ='btn text-light bg-danger m-1 edit-staff-btn' data-toggle='modal' data-target='#container-staff-form'" +
-                "onclick='GiuMaNhanVien(`" + result.data + "`)'>Sửa</button>" +
-                "<button class='btn bg-warning m-1' data-toggle='modal' data-target='#removeStaff'" +
-                "onclick='GiuMaNhanVien(`" + result.data + "`)'>Xóa</button>" +
-                "</td>" +
-                "</tr>";
-
-            if (SelectedMaNhanVien === "" || SelectedMaNhanVien === null) {
-
-                $(".staff-table").children("tbody").prepend(newRow);
-            } else {
-                $("#" + SelectedMaNhanVien).replaceWith(newRow);
-            }
-            $(".edit-staff-btn").click(fillStaffForm);
-
             $(".close").click();
+            $(".loading").removeClass("loader--hidden");
+            $(".loading").addClass("loader");
+
+            setTimeout(() => {
+                $(".loading").addClass("loader--hidden");
+            }, 500);
+
+            //
+            $(".loader").on("transitionend", function () {
+                $(".loading").removeClass("loader");
+            });
+
+            setTimeout(() => {
+                var newRow = "<tr class='data' id='" + result.data + "'>" +
+                    "<td>" + result.data + "</td>" +
+                    "<td class='hoten'>" + hoTen + "</td>" +
+                    "<td class='ngaysinh'>" + DobFormated + "</td>" +
+                    "<td>" + Sdt + "</td>" +
+                    "<td>" + chucVu + "</td>" +
+                    "<td class='btn-area'>" +
+                    "<button class ='btn text-light bg-danger m-1 edit-staff-btn' data-toggle='modal' data-target='#container-staff-form'" +
+                    "onclick='GiuMaNhanVien(`" + result.data + "`)'>Sửa</button>" +
+                    "<button class='btn bg-warning m-1' data-toggle='modal' data-target='#removeStaff'" +
+                    "onclick='GiuMaNhanVien(`" + result.data + "`)'>Xóa</button>" +
+                    "</td>" +
+                    "</tr>";
+
+                if (SelectedMaNhanVien === "" || SelectedMaNhanVien === null) {
+                    console.log("1")
+                    $(".staff-table").children("tbody").prepend(newRow);
+                } else {
+                    console.log("2")
+                    $("#" + SelectedMaNhanVien).replaceWith(newRow);
+                }
+                $(".edit-staff-btn").click(fillStaffForm);
+            }, 600);
 
         } else {
             alert("Nhan Vien da ton tai");

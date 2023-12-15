@@ -15,9 +15,9 @@ namespace BaiTap_phan3.Models
         public string MaNhanVien { get; set; }
         public string HoVaTen { get; set; }
         public DateTime NgayThangNamSinh { get; set; }
-        public string SoDienThoai { get; set; }
+        public string? SoDienThoai { get; set; }
         public string DiaChi { get; set; }
-        public string ChucVu { get; set; }
+        public string? ChucVu { get; set; }
         public int SoNamCongTac { get; set; }
         #endregion
 

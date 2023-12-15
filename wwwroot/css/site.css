@@ -52,8 +52,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: cornflowerblue;
-  transition: opacity 0.75s, visibility 0.75s;
+  transition: opacity 0.5s, visibility 0.5s;
 }
 
 .loader--hidden{
@@ -68,7 +67,7 @@ body {
   border: 12px solid lightblue;
   border-bottom: 12px solid black;
   border-radius: 50%;
-  animation: spin 0.75s ease infinite;
+  animation: spin 0.5s ease infinite;
 }
 
 @keyframes spin {

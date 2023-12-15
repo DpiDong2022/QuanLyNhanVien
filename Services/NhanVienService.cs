@@ -5,6 +5,11 @@ using BaiTap_phan3.Models;
 using BaiTap_phan3.Function;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Mvc;
+using System.Data.Common;
+using System.Data.SqlClient;
+using Npgsql;
+using System.Net.Http.Headers;
+using Dapper;
 
 namespace BaiTap_phan3.Services
 {
@@ -13,10 +18,13 @@ namespace BaiTap_phan3.Services
     {
 
         private readonly IHttpContextAccessor _contextAccessor;
-        public NhanVienService(IHttpContextAccessor contextAccessor)
+        private readonly IConfiguration _configuration;
+        private readonly DBServices<NhanVien> _dBServices;
+        public NhanVienService(IHttpContextAccessor contextAccessor, IConfiguration configuration)
         {
             _contextAccessor = contextAccessor;
-
+            _configuration = configuration;
+            _dBServices = new DBServices<NhanVien>(_configuration);
         }
 
         public ResponseMvc Sua(NhanVien nhanVienMoi)
@@ -46,10 +54,10 @@ namespace BaiTap_phan3.Services
 
         }
 
-        public ResponseMvc Them( NhanVien nhanVienMoi)
+        public ResponseMvc Them(NhanVien nhanVienMoi)
         {
-            ResponseMvc response = new ResponseMvc();
             Dictionary<string, NhanVien> nhanVienDictionary = CenterTool.GetDanhSachNhanVien();
+            var response = new ResponseMvc(){};
             foreach (var nhanVien in nhanVienDictionary)
             {
                 if (nhanVienMoi.HoVaTen == nhanVien.Value.HoVaTen && nhanVienMoi.NgayThangNamSinh == nhanVien.Value.NgayThangNamSinh)
@@ -65,9 +73,8 @@ namespace BaiTap_phan3.Services
             response.data = nhanVienMoi.MaNhanVien.ToUpper();
 
             CenterTool.ContextAccessor.HttpContext.Session.SetString(
-                nhanVienMoi.MaNhanVien, JsonConvert.SerializeObject(nhanVienMoi));
+            nhanVienMoi.MaNhanVien, JsonConvert.SerializeObject(nhanVienMoi));
             return response;
-
         }
 
         public ResponseMvc Xoa(string keyNV)
@@ -75,6 +82,12 @@ namespace BaiTap_phan3.Services
             CenterTool.ContextAccessor.HttpContext.Session.Remove(keyNV);
             return new ResponseMvc() { Success = true, Message = "Xóa thành công" };
 
+        }
+
+        public async Task<IEnumerable<NhanVien>> List()
+        {
+            IEnumerable<NhanVien> nhanViens = _dBServices.GetTable("NhanVien").Result;
+            return nhanViens;
         }
     }
 }

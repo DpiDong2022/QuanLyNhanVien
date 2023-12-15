@@ -12,10 +12,10 @@ namespace BaiTap_phan3.Controllers
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly NhanVienService _nhanVienService;
-        public StaffController(IHttpContextAccessor httpContextAccessor)
+        public StaffController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
         {
             _httpContextAccessor = httpContextAccessor;
-            _nhanVienService = new NhanVienService(_httpContextAccessor);
+            _nhanVienService = new NhanVienService(_httpContextAccessor, configuration);
         }
 
         [HttpGet]
@@ -71,6 +71,12 @@ namespace BaiTap_phan3.Controllers
         {
             return Content("Đang xây dựng");
 
+        }
+
+        [HttpGet]
+        public IActionResult List(){
+            Task<IEnumerable<NhanVien>> result = _nhanVienService.List();
+            return Json(result.Result);
         }
     }
 }
