@@ -31,13 +31,11 @@ namespace BaiTap_phan3.Services
 
         //private readonly IHttpContextAccessor _contextAccessor;
         //private readonly IConfiguration _configuration;
-        public static List<NhanVien> NhanViens;
         private readonly DapperContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
         public NhanVienService(DapperContext dapperContext, IWebHostEnvironment webHostEnvironment)
         {
             _context = dapperContext;
-            NhanViens = GetList().Result.ToList();
             _webHostEnvironment = webHostEnvironment;
         }
 
@@ -54,7 +52,7 @@ namespace BaiTap_phan3.Services
 
         public async Task<ResponseMvc> Sua(int id, NhanVienDto nhanVien)
         {
-            if (!IsValid(nhanVien.HoVaTen, nhanVien.NgaySinh, id))
+            if ( !await IsValid(nhanVien.HoVaTen, nhanVien.NgaySinh, id))
             {
                 return new ResponseMvc() { Message = "Họ tên và ngày sinh của nhân viên bị trùng" };
             }
@@ -100,7 +98,7 @@ namespace BaiTap_phan3.Services
 
         public async Task<ResponseMvc> Them(NhanVienDto nhanVien)
         {
-            if (!IsValid(nhanVien.HoVaTen, nhanVien.NgaySinh))
+            if (!await IsValid(nhanVien.HoVaTen, nhanVien.NgaySinh))
             {
                 throw new ArgumentException("Nhân viên đã tồn tại", nameof(nhanVien));
             }
@@ -181,10 +179,11 @@ namespace BaiTap_phan3.Services
             }
         }
 
-        private bool IsValid(string hoTen, DateTime ngaySinh, int id = -1)
+        private async Task<bool> IsValid(string hoTen, DateTime ngaySinh, int id = -1)
         {
             hoTen = hoTen.ToLower();
-            if (NhanViens.Any(c => c.HoVaTen.ToLower() == hoTen && c.NgaySinh == ngaySinh && c.Id != id))
+            IEnumerable<NhanVien> nhanViens = await GetList();
+            if (nhanViens.Any(c => c.HoVaTen.ToLower() == hoTen && c.NgaySinh == ngaySinh && c.Id != id))
             {
                 return false;
             }
