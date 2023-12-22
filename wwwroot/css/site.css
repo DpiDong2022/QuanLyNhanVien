@@ -1,5 +1,6 @@
 html {
   font-size: 14px;
+  background-color: #FFFACD;
 }
 
 @media (min-width: 768px) {
@@ -23,6 +24,7 @@ html {
 
 body {
   margin-bottom: 60px;
+  background-color: #FFFACD;
 }
 
 .Staff #container-staff-form span {
@@ -80,4 +82,42 @@ body {
   100% {
     -webkit-transform: rotate(360deg);
   }
+}
+
+@keyframes down{
+  0%{transform: translateX(80px);}
+  100%{transform: translateX(0);}
+}
+
+.dropdown{
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content{
+  display: none;
+  position: absolute;
+  top: 40px;
+  min-width: 150px;
+  background-color: white;
+  z-index: 1;
+  animation: down 0.15s linear;
+}
+
+.dropdown-content a{
+  padding: 10px;
+  background-color: white;
+  text-decoration: none;
+  display: block;
+  cursor: pointer;
+}
+
+.dropdown-content a:hover{
+  color: white;
+  background-color: rgb(202, 202, 230);
+  border: 1px solid black;
+}
+
+.dropdown:hover .dropdown-content{
+  display: block;
 }

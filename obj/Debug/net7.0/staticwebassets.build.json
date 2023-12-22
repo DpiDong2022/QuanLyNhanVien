@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "uhQnQv0UhhuKN5WlhQfAvSNcyv0Q32Um3kZQlIie7jE=",
+  "Hash": "Sc5RvR7fTAx9iGhkRw79s7iCBL4K0/RBcgMSKuRL7jc=",
   "Source": "BaiTap-phan3",
   "BasePath": "_content/BaiTap-phan3",
   "Mode": "Default",
@@ -1069,6 +1069,40 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\lib\\jquery\\LICENSE.txt"
+    },
+    {
+      "Identity": "C:\\Users\\ADMIN\\Desktop\\VietGis_baiTap\\BaiTap-phan3\\wwwroot\\Templates\\NhanVien.xlsx",
+      "SourceId": "BaiTap-phan3",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\ADMIN\\Desktop\\VietGis_baiTap\\BaiTap-phan3\\wwwroot\\",
+      "BasePath": "_content/BaiTap-phan3",
+      "RelativePath": "Templates/NhanVien.xlsx",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Templates\\NhanVien.xlsx"
+    },
+    {
+      "Identity": "C:\\Users\\ADMIN\\Desktop\\VietGis_baiTap\\BaiTap-phan3\\wwwroot\\Templates\\NhanVienBaoCao.xlsx",
+      "SourceId": "BaiTap-phan3",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\ADMIN\\Desktop\\VietGis_baiTap\\BaiTap-phan3\\wwwroot\\",
+      "BasePath": "_content/BaiTap-phan3",
+      "RelativePath": "Templates/NhanVienBaoCao.xlsx",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Templates\\NhanVienBaoCao.xlsx"
     }
   ]
 }

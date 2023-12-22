@@ -1,24 +1,19 @@
 using System;
 using System.Text;
-using BaiTap_phan3.Function;
 
 namespace BaiTap_phan3.Models
 {
 
     public class NhanVien
     {
-        #region Fields
-        public static List<NhanVien> NhanViens = new List<NhanVien>();
-        #endregion
-
         #region Properties
-        public string MaNhanVien { get; set; }
+        public int Id { get; set; }
         public string HoVaTen { get; set; }
-        public DateTime NgayThangNamSinh { get; set; }
-        public string? SoDienThoai { get; set; }
-        public string DiaChi { get; set; }
+        public DateTime NgaySinh { get; set; }
+        public string? DienThoai { get; set; }
         public string? ChucVu { get; set; }
-        public int SoNamCongTac { get; set; }
+        public int? PhongBanId { get; set; }=0;
+        public PhongBan? PhongBan {get; set;}
         #endregion
 
 
@@ -26,29 +21,16 @@ namespace BaiTap_phan3.Models
         public NhanVien()
         {
         }
-        public NhanVien(string hoVaTen, DateTime ngayThangNamSinh, string soDienThoai,
-                        string diaChi, string chucVu, int soNamCongTac)
+        public NhanVien(string hoVaTen, DateTime ngaySinh, string soDienThoai, string chucVu)
         {
             HoVaTen = hoVaTen;
-            NgayThangNamSinh = ngayThangNamSinh;
-            SoDienThoai = soDienThoai;
-            DiaChi = diaChi;
+            NgaySinh = ngaySinh;
+            DienThoai = DienThoai;
             ChucVu = chucVu;
-            SoNamCongTac = soNamCongTac;
         }
 
         #endregion
 
         ~NhanVien() { }
-
-
-        #region Methods
-
-        public void HienThiThongTin()
-        {
-            Console.WriteLine($"\tMã nhân viên: {MaNhanVien}, Họ và tên: {HoVaTen}, Ngày sinh: {NgayThangNamSinh.ToString("d/M/yyyy")}, " +
-                $"Số điện thoại: {SoDienThoai}, Địa chỉ: {DiaChi}, Chức vụ; {ChucVu}, Số năm công tác: {SoNamCongTac}");
-        }
-        #endregion
     }
 }

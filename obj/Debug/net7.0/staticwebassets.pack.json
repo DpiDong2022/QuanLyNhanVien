@@ -5,6 +5,14 @@
       "PackagePath": "staticwebassets\\BaiTap-phan3.bundle.scp.css"
     },
     {
+      "Id": "C:\\Users\\ADMIN\\Desktop\\VietGis_baiTap\\BaiTap-phan3\\wwwroot\\Templates\\NhanVien.xlsx",
+      "PackagePath": "staticwebassets\\Templates\\NhanVien.xlsx"
+    },
+    {
+      "Id": "C:\\Users\\ADMIN\\Desktop\\VietGis_baiTap\\BaiTap-phan3\\wwwroot\\Templates\\NhanVienBaoCao.xlsx",
+      "PackagePath": "staticwebassets\\Templates\\NhanVienBaoCao.xlsx"
+    },
+    {
       "Id": "C:\\Users\\ADMIN\\Desktop\\VietGis_baiTap\\BaiTap-phan3\\wwwroot\\css\\site.css",
       "PackagePath": "staticwebassets\\css\\site.css"
     },

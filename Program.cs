@@ -1,21 +1,26 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using BaiTap_phan3.Function;
+using BaiTap_phan3.DBContext;
+using BaiTap_phan3.Interfaces;
+using BaiTap_phan3.Services;
+using BaiTap_phan3.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().AddJsonOptions(
+    option => {option.JsonSerializerOptions.PropertyNamingPolicy=null;});
 
 // Use HttpContext
+builder.Services.AddSingleton<DapperContext>();
+builder.Services.AddScoped<INhanVienService, NhanVienService>();
+builder.Services.AddScoped<IPhongBanService, PhongBanService>();
 builder.Services.AddControllers();
-builder.Services.AddHttpContextAccessor();
-builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 // use HttpContext
 
 // for session
-builder.Services.AddDistributedMemoryCache();   
-builder.Services.AddSession(option => option.IdleTimeout = TimeSpan.FromMinutes(140));
+// builder.Services.AddDistributedMemoryCache();   
+// builder.Services.AddSession(option => option.IdleTimeout = TimeSpan.FromMinutes(140));
 // IdleTimeout sẽ khiến nội dung trong sesstion biến mất trong bao lâu,
 // nếu load lại trang khi sesstion chưa bị xóa thì thười gian sẽ được tính lại
 //for session
@@ -37,7 +42,7 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.UseSession();
+// app.UseSession();
 
 app.MapControllerRoute(
     name: "default",

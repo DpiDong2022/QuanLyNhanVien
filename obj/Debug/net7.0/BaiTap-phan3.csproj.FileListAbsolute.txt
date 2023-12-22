@@ -42,3 +42,13 @@ C:\Users\ADMIN\Desktop\VietGis_baiTap\BaiTap-phan3\bin\Debug\net7.0\runtimes\win
 C:\Users\ADMIN\Desktop\VietGis_baiTap\BaiTap-phan3\bin\Debug\net7.0\runtimes\win-x86\native\sni.dll
 C:\Users\ADMIN\Desktop\VietGis_baiTap\BaiTap-phan3\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
 C:\Users\ADMIN\Desktop\VietGis_baiTap\BaiTap-phan3\bin\Debug\net7.0\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
+C:\Users\ADMIN\Desktop\VietGis_baiTap\BaiTap-phan3\bin\Debug\net7.0\EPPlus.dll
+C:\Users\ADMIN\Desktop\VietGis_baiTap\BaiTap-phan3\bin\Debug\net7.0\EPPlus.Interfaces.dll
+C:\Users\ADMIN\Desktop\VietGis_baiTap\BaiTap-phan3\bin\Debug\net7.0\EPPlus.System.Drawing.dll
+C:\Users\ADMIN\Desktop\VietGis_baiTap\BaiTap-phan3\bin\Debug\net7.0\Microsoft.IO.RecyclableMemoryStream.dll
+C:\Users\ADMIN\Desktop\VietGis_baiTap\BaiTap-phan3\bin\Debug\net7.0\Microsoft.Win32.SystemEvents.dll
+C:\Users\ADMIN\Desktop\VietGis_baiTap\BaiTap-phan3\bin\Debug\net7.0\System.Drawing.Common.dll
+C:\Users\ADMIN\Desktop\VietGis_baiTap\BaiTap-phan3\bin\Debug\net7.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\ADMIN\Desktop\VietGis_baiTap\BaiTap-phan3\bin\Debug\net7.0\runtimes\win\lib\net7.0\Microsoft.Win32.SystemEvents.dll
+C:\Users\ADMIN\Desktop\VietGis_baiTap\BaiTap-phan3\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.Drawing.Common.dll
+C:\Users\ADMIN\Desktop\VietGis_baiTap\BaiTap-phan3\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.Security.Cryptography.Pkcs.dll
