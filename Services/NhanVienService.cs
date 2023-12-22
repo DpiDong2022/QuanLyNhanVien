@@ -166,7 +166,7 @@ namespace BaiTap_phan3.Services
                     sheet.Cells[rowIndex, 4].Value = nhanViens[i].NgaySinh.ToString("dd-MM-yyyy");
                     sheet.Cells[rowIndex, 5].Value = nhanViens[i].DienThoai;
                     sheet.Cells[rowIndex, 6].Value = nhanViens[i].ChucVu;
-                    sheet.Cells[rowIndex, 7].Value = nhanViens[i].PhongBan.TenPhongBan;
+                    sheet.Cells[rowIndex, 7].Value = nhanViens[i].PhongBan?.TenPhongBan;
 
                     rowIndex++;
                 }
