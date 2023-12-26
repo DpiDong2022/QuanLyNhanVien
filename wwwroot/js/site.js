@@ -1,90 +1,77 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-// Write your JavaScript code.
+﻿
 let SelectedIdNhanVien;
+const RecordAmount = 10;
+let CurrentPage = 1;
+let LocPhongBanId = 0;
+let TotalPage = 0;
 let DanhSachNhanVien = [];
-let currentPage = 1;
-const recordAmount = 10;
-let locPhongBanId = 0;
-let totalPage = 0;
-let showedStaff = [];
-let searchStaff = [];
-let phongBanList = [];
+let ShowedStaff = [];
+let SearchStaff = [];
+let PhongBanList = [];
 
-
-// tai len danh sach nhan vien
+// lấy danh sach nhan vien và phòng ban
 $(document).ready(function () {
 
-    let options2 = {};
-    options2.url = "Department/GetList";
-    options2.type = "get";
-    options2.textContent = "application/json";
+    // lấy dữ liệu và render phòng ban element
+    options = {};
+    options.url = "Department/GetList";
+    options.type = "get";
+    options.textContent = "application/json";
 
-    $.ajax(options2).done(function (result) {
-        phongBanList = result;
+    $.ajax(options).done(function (result) {
+        PhongBanList = result;
 
-        const departmentTable = $("#department-body");
         const phongBan_selection = $("#phongban-selection");
         const phongban_dropdown = $(".phongban .dropdown-content");
 
-        for (let i = 0; i < phongBanList.length; i++) {
-            var Pb = phongBanList[i];
-            var row = `<tr id="${Pb.Id}">
-                              <td>${Pb.Id}</td>
-                                <td>${Pb.TenPhongBan}</td>
-                            <td>
-                                <button class="btn bg-light">Edit</button>
-                                <button class="btn btn-danger">Delete</button>
-                            </td>
-                        </tr>`;
+        for (let i = 0; i < PhongBanList.length; i++) {
+            var phongBan = PhongBanList[i];
 
-            var dropDownItem = `<a data-id="${Pb.Id}" onclick="LocPhongBan(${Pb.Id})">${Pb.TenPhongBan}</a>`;
+            var dropDownItem = `<a data-id="${phongBan.Id}" onclick="LocPhongBan(${phongBan.Id})">${phongBan.TenPhongBan}</a>`;
             phongban_dropdown.append(dropDownItem);
 
-            departmentTable.append(row);
-
-            var option = `<option data-id="${Pb.Id}" value="${Pb.TenPhongBan}">
-                ${Pb.TenPhongBan}
-            </option>`;
+            var option = `<option data-id="${phongBan.Id}" value="${phongBan.TenPhongBan}">${phongBan.TenPhongBan} </option>`;
             phongBan_selection.append(option);
         }
     });
 
-    // render nhan vien
-    let options = {};
+    // lấy dữ liệu và render bảng Nhân viên
+    options = {};
     options.url = "Staff/List";
     options.type = "get";
     options.textContent = "application/json";
 
     $.ajax(options).done(function (result) {
         DanhSachNhanVien = result;
-        currentPage = 1
+        CurrentPage = 1
         TimKiem();
     });
 });
 
 function changeCurrentPage(number) {
-    currentPage = number;
+    CurrentPage = number;
     TimKiem();
 }
 
 function LocPhongBan(Id) {
-    locPhongBanId = Id;
-    let phongbanSpan = $(".phongban .dropdown-span");
+    LocPhongBanId = Id;
+    let phongbanSpanP = $(".phongban .dropdown-span p");
     if (Id == 0) {
-        phongbanSpan.text("--Tất cả--");
+        phongbanSpanP.html("Phòng ban: --Tất cả--");
     } else {
-        let tenPhongBan = phongBanList.find(c => c.Id == Id).TenPhongBan;
-        phongbanSpan.text(tenPhongBan);
+        let tenPhongBan = PhongBanList.find(c => c.Id == Id).TenPhongBan;
+        phongbanSpanP.html("Phòng ban: " + tenPhongBan);
     }
-
-    TimKiem(true);
+    CurrentPage = 1;
+    TimKiem();
 }
 
 function renderPageNumber() {
-    document.getElementById("staff_pagination").innerHTML = "";
-    for (let index = 1; index <= totalPage; index++) {
-        document.getElementById("staff_pagination").innerHTML += `<button class="btn bg-light mx-1"` +
+    document.getElementById("staff_pagination").innerHTML = "" + `<button class="btn mx-1"` +
+        `onclick="changeCurrentPage(${1})">${1}</button>`;
+
+    for (let index = 2; index <= TotalPage; index++) {
+        document.getElementById("staff_pagination").innerHTML += `<button class="btn mx-1"` +
             `onclick="changeCurrentPage(${index})">${index}</button>`;
     }
 }
@@ -94,7 +81,7 @@ function render_staffs() {
     table.empty();
     let row;
 
-    for (nhanVien of showedStaff) {
+    for (nhanVien of ShowedStaff) {
         row = staff_row(nhanVien.Id, nhanVien.HoVaTen, nhanVien.NgaySinh, nhanVien.DienThoai, nhanVien.ChucVu, nhanVien.PhongBanId);
         table.append(row);
     }
@@ -102,70 +89,53 @@ function render_staffs() {
     $(".edit-staff-btn").click(fillStaffForm);
 }
 
-function TimKiem(isFromBtn = false) {
-    if (isFromBtn) currentPage = 1;
-
+function TimKiem() {
     const searhString = $("#searchInput").val().toLowerCase();
-    const keySplited = searhString.split(" ");
 
     if (searhString == "" || searhString == null) {
-        if (locPhongBanId == 0) {
-            searchStaff = DanhSachNhanVien;
-            showedStaff = DanhSachNhanVien.slice(
-                (currentPage - 1) * recordAmount,
-                (currentPage - 1) * recordAmount + recordAmount);
-            totalPage = Math.ceil(DanhSachNhanVien.length / recordAmount);
-        } else {
-            showedStaff = DanhSachNhanVien.filter(nhanVien => {
-                return nhanVien.PhongBanId == locPhongBanId;
-            });
-            searchStaff = showedStaff;
-            totalPage = Math.ceil(showedStaff.length / recordAmount);
-            showedStaff = showedStaff.slice(
-                (currentPage - 1) * recordAmount,
-                (currentPage - 1) * recordAmount + recordAmount);
-        }
+        SearchStaff = DanhSachNhanVien;
     } else {
-        // lọc ra dòng cần tìm
-        if (locPhongBanId == 0) {
-            showedStaff = DanhSachNhanVien.filter(nhanVien => {
-                return keySplited.some(c => nhanVien.HoVaTen.toLowerCase().includes(c))
-            });
-        } else {
-            showedStaff = DanhSachNhanVien.filter(nhanVien => {
-                return (keySplited.some(c => nhanVien.HoVaTen.toLowerCase().includes(c))
-                    && nhanVien.PhongBanId == locPhongBanId)
-            });
-        }
-        searchStaff = showedStaff;
-        totalPage = Math.ceil(showedStaff.length / recordAmount);
-        showedStaff = showedStaff.slice(
-            (currentPage - 1) * recordAmount,
-            (currentPage - 1) * recordAmount + recordAmount);
+        const keySplited = searhString.split(" ");
+        SearchStaff = DanhSachNhanVien.filter(nhanVien => {
+            return keySplited.some(c => nhanVien.HoVaTen.toLowerCase().includes(c))
+        });
+    }
+    // lọc phòng ban
+    if (LocPhongBanId != 0) {
+        SearchStaff = SearchStaff.filter(nhanVien => {
+            return nhanVien.PhongBanId === LocPhongBanId;
+        });
     }
 
+    TotalPage = Math.ceil(SearchStaff.length / RecordAmount);
+    ShowedStaff = SearchStaff.slice(
+        (CurrentPage - 1) * RecordAmount,
+        (CurrentPage - 1) * RecordAmount + RecordAmount);
 
-    // render
+    // render bảng nhân nhiên, nút phân trang
     render_staffs();
     renderPageNumber();
 }
 
 function staff_row(id, hoVaTen, ngaySinh, dienThoai, chucVu, phongBanId) {
-    var ten = "Chưa chọn";
+    var tenPhongBan;
 
-    if (phongBanId != undefined && phongBanId != "") {
+    if (phongBanId == 0 || phongBanId == undefined) {
+        tenPhongBan = "Chưa chọn";
+    }
+    else if (phongBanId != undefined && phongBanId != "") {
 
-        let phongBan = phongBanList.find(item => item.Id == phongBanId);
-        ten = phongBan.TenPhongBan;
+        let phongBan = PhongBanList.find(item => item.Id == phongBanId);
+        tenPhongBan = phongBan.TenPhongBan;
         phongBanId = phongBan.Id;
     }
-    debugger;
     if (dienThoai == null || dienThoai == "null") {
         dienThoai = "";
     }
     if (chucVu == null || chucVu == "null") {
         chucVu = "";
     }
+    debugger;
 
     return `<tr id="${id}">
                 <td>${id}</td>
@@ -173,13 +143,13 @@ function staff_row(id, hoVaTen, ngaySinh, dienThoai, chucVu, phongBanId) {
                 <td class="ngaysinh">${DobFormat(ngaySinh)}</td>
                 <td>${dienThoai}</td>
                 <td>${chucVu}</td>
-                <td data-id="${phongBanId}">${ten}</td>
+                <td data-id="${phongBanId}">${tenPhongBan}</td>
                 <td class="btn-area">
                     <button class="btn bg-warning m-1 edit-staff-btn" data-toggle="modal" 
                         data-target="#container-staff-form" onclick="GiuMaNhanVien(${id})">Sửa</button>
                     <button class="btn text-light bg-danger m-1" data-toggle="modal" 
                         data-target="#removeStaff" onclick="GiuMaNhanVien(${id})">Xóa</button>
-                        </td>
+                </td>
             </tr>`
 }
 
@@ -188,31 +158,31 @@ function fillStaffForm() {
     var Dob = $("#" + SelectedIdNhanVien).children(".ngaysinh").text();
     var number = $("#" + SelectedIdNhanVien).children("td:nth-child(4)").text();
     var position = $("#" + SelectedIdNhanVien).children("td:nth-child(5)").text();
-    var Department = $("#" + SelectedIdNhanVien).children("td:nth-child(6)").text();
+    var department = $("#" + SelectedIdNhanVien).children("td:nth-child(6)").text();
 
     $("#HoVaTen").val(name);
     $("#DOB").val(Dob);
     $("#DienThoai").val(number);
     $("#ChucVu").val(position);
 
-    if (Department != "Chưa chọn") {
-        $("#phongban-selection").val(Department);
+    if (department != "Chưa chọn") {
+        $("#phongban-selection").val(department);
     }
 
 }
 
 // validate ngay sinh
 function validateDob() {
-    const dateOfBirth = $("#DOB").val();
+    const DobInput = $("#DOB").val();
     const currentYear = new Date().getFullYear();
-    const inputYear = parseInt(dateOfBirth.substring(0, 4));
+    const yearInput = parseInt(DobInput.substring(0, 4));
 
-    if (dateOfBirth == "") {
+    if (DobInput == "") {
         $("#DobError").show();
         $("#DobError").html("*Ngày sinh là bắt buộc");
         $("#error-staff-form").html("");
         return false;
-    } else if ((currentYear - inputYear) < 18) {
+    } else if ((currentYear - yearInput) < 18) {
 
         $("#DobError").show();
         $("#DobError").html("*Ngày sinh không hợp lệ, nhân viên chưa đủ 18 tuổi");
@@ -237,7 +207,7 @@ function validateName() {
     }
 }
 
-// make defautl for staff form
+// clear form thêm/sửa nhân viên
 $(document).ready(function () {
     $(".modal").on("hidden.bs.modal", function () {
         document.getElementById("staff-form").reset();
@@ -248,7 +218,7 @@ $(document).ready(function () {
 
 });
 
-// event nhan nut tao nhan vien
+// kiểm tra dữ liệu thêm/sửa
 $(document).ready(function () {
     $("#createBtn").click(function () {
         if (validateDob() & validateName()) {
@@ -265,10 +235,10 @@ $(document).ready(function () {
     });
 })
 
-// Kiem tra nhan vien da ton tai
+// Kiem tra thông tin nhan vien ở trong form nhân viên da ton tai
 function isStaffExist() {
-    let currentName = $("#HoVaTen").val().toLowerCase();
-    let currentDob = $("#DOB").val();
+    let NameInput = $("#HoVaTen").val().toLowerCase();
+    let DobInput = $("#DOB").val();
 
     var rows = Array.from($("#staff-row-container tr"));
     let name, date, id;
@@ -276,7 +246,7 @@ function isStaffExist() {
         name = $(row).children(".hoten").text().toLowerCase();
         date = $(row).children(".ngaysinh").text();
         id = $(row).children("td:nth-child(1)").text();
-        if (name == currentName && currentDob == date && id != SelectedIdNhanVien) {
+        if (name == NameInput && DobInput == date && id != SelectedIdNhanVien) {
             return true;
         }
     };
@@ -317,7 +287,6 @@ function updateStaff() {
                 $(".loading").addClass("loader--hidden");
             }, 500);
 
-            //
             $(".loader").on("transitionend", function () {
                 $(".loading").removeClass("loader");
             });
@@ -325,34 +294,26 @@ function updateStaff() {
             setTimeout(() => {
                 id = result.data == null ? SelectedIdNhanVien : result.data;
                 var newRow = staff_row(id, hoTen, Dob, Sdt, chucVu, phongBanId);
-
+                let nhanVien = {
+                    "Id": id,
+                    "HoVaTen": hoTen,
+                    "NgaySinh": Dob,
+                    "DienThoai": Sdt,
+                    "ChucVu": chucVu,
+                    "PhongBanId": phongBanId
+                };
                 if (SelectedIdNhanVien == undefined) {
 
                     $(".staff-table").children("tbody").prepend(newRow);
-                    DanhSachNhanVien.push({
-                        "Id": id,
-                        "HoVaTen": hoTen,
-                        "NgaySinh": Dob,
-                        "DienThoai": Sdt,
-                        "ChucVu": chucVu,
-                        "PhongBanId": phongBanId
-                    });
-                    debugger;
-                    console.log(DanhSachNhanVien);
+                    DanhSachNhanVien.push(nhanVien);
                 } else {
                     $("#" + id).replaceWith(newRow);
                     index = DanhSachNhanVien.findIndex(function (nhanVien) {
                         return nhanVien.Id === id
                     });
-                    DanhSachNhanVien[index] = {
-                        "Id": id,
-                        "HoVaTen": hoTen,
-                        "NgaySinh": Dob,
-                        "DienThoai": Sdt,
-                        "ChucVu": chucVu,
-                        "PhongBanId": phongBanId
-                    }
+                    DanhSachNhanVien[index] = nhanVien;
                 }
+                $(".staff-table tr#" + id).css("animation", "leftToRightIn 0.3s linear");
                 $(".edit-staff-btn").click(fillStaffForm);
             }, 600);
 
@@ -378,15 +339,12 @@ $(document).ready(function () {
             DanhSachNhanVien.splice(index, 1);
 
             let deletedRow = $("#" + SelectedIdNhanVien);
-
-            deletedRow.addClass("bg-danger");
-            deletedRow.animate(600, {
-                right: "100px"
-            })
+            deletedRow.css("animation", "leftToRightOut 0.5s linear");
 
             setTimeout(function () {
                 deletedRow.remove()
-            }, 400);
+            }, 500);
+            SelectedIdNhanVien = undefined;
         });
     });
 });
@@ -399,12 +357,12 @@ function GiuMaNhanVien(id) {
 function ExportToExcel() {
     let nhanVienss = [];
 
-    for (let nv of searchStaff) {
-        var phongban = phongBanList.find(c => c.Id == nv.PhongBanId);
-        if(nv.ChucVu =="null" || nv.ChucVu == null){    
+    for (let nv of SearchStaff) {
+        var phongban = PhongBanList.find(c => c.Id == nv.PhongBanId);
+        if (nv.ChucVu == "null" || nv.ChucVu == null) {
             nv.ChucVu = "";
         }
-        if(nv.DienThoai =="null" || nv.DienThoai == null){    
+        if (nv.DienThoai == "null" || nv.DienThoai == null) {
             nv.DienThoai = "";
         }
         var nhanVien = {
@@ -420,47 +378,29 @@ function ExportToExcel() {
         };
         nhanVienss.push(nhanVien);
     };
-    debugger;
     var options = {};
     options.url = "Staff/Report";
     options.type = "post";
     options.contentType = "application/json";
     options.data = JSON.stringify(nhanVienss);
 
-    $.ajax(options).done(function (data) {
-        window.location.href = "Staff/Download?filePath=" + data + "&fileName=BaoCaoNhanVien.xlsx";
+    $.ajax(options).done(function (result) {
+        if (result.Success) {
+            window.location.href = "Staff/Download?filePath=" + result.data + "&fileName=BaoCaoNhanVien.xlsx";
+        } else {
+            alert(result.Message);
+        }
     });
 }
 
 // Khởi chạy tìm kiếm khi ấn enter
 $(document).ready(function () {
-    currentPage = 1;
     $("#searchInput").on("keyup", function (event) {
         if (event.key === "Enter") {
-            TimKiem(true);
+            CurrentPage = 1;
+            TimKiem();
         }
     });
-});
-
-// Login
-let index = 0
-function OpenStaff() {
-    const password = $("#pass").val();
-    const confirm_password = $("#cpass").val();
-
-    if (password == "" || confirm_password == "") return
-
-    if (password == confirm_password) {
-        window.open("Index", "_blank")
-    }
-}
-
-$(document).ready(function () {
-    $("#createBtn").click(function () {
-        if ($("#container-staff-form").attr("display") == "none") {
-
-        }
-    })
 });
 
 function DobFormat(dateTime) {

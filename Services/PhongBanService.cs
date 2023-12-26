@@ -23,20 +23,5 @@ namespace BaiTap_phan3.Services
                 return phongBans;
             }
         }
-
-        public Task<ResponseMvc> Sua(int id, PhongBan nhanVien)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ResponseMvc> Them(PhongBan nhanVien)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ResponseMvc> Xoa(int id)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

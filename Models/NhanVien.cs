@@ -25,7 +25,7 @@ namespace BaiTap_phan3.Models
         {
             HoVaTen = hoVaTen;
             NgaySinh = ngaySinh;
-            DienThoai = DienThoai;
+            DienThoai = soDienThoai;
             ChucVu = chucVu;
         }
 

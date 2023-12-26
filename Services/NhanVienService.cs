@@ -2,35 +2,17 @@ using System;
 using BaiTap_phan3.Interfaces;
 using BaiTap_phan3.Response;
 using BaiTap_phan3.Models;
-using Newtonsoft.Json;
-using Microsoft.AspNetCore.Mvc;
-using System.Data.Common;
-using System.Data.SqlClient;
-using Npgsql;
-using System.Net.Http.Headers;
 using Dapper;
-using System.Threading.Tasks.Dataflow;
-using System.Diagnostics;
 using BaiTap_phan3.DBContext;
-using System.Reflection.Metadata;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Data;
 using BaiTap_phan3.DTO;
-using Microsoft.Extensions.WebEncoders;
-using Microsoft.AspNetCore.Hosting;
-using System.IO;
-using System.Runtime.CompilerServices;
 using OfficeOpenXml;
-using System.ComponentModel;
 
 namespace BaiTap_phan3.Services
 {
 
     public class NhanVienService : INhanVienService
     {
-
-        //private readonly IHttpContextAccessor _contextAccessor;
-        //private readonly IConfiguration _configuration;
         private readonly DapperContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
         public NhanVienService(DapperContext dapperContext, IWebHostEnvironment webHostEnvironment)
@@ -52,8 +34,9 @@ namespace BaiTap_phan3.Services
 
         public async Task<ResponseMvc> Sua(int id, NhanVienDto nhanVien)
         {
-            if ( !await IsValid(nhanVien.HoVaTen, nhanVien.NgaySinh, id))
+            if (!await IsValid(nhanVien.HoVaTen, nhanVien.NgaySinh, id))
             {
+
                 return new ResponseMvc() { Message = "Họ tên và ngày sinh của nhân viên bị trùng" };
             }
 
@@ -129,11 +112,20 @@ namespace BaiTap_phan3.Services
         public async Task<ResponseMvc> Xoa(int id)
         {
             string query = "DELETE FROM \"NhanVien\" WHERE \"Id\" = @Id";
-            using (var connection = _context.CreateConnection())
+            try
             {
-                await connection.ExecuteAsync(query, new { Id = id });
-                return new ResponseMvc() { Success = true };
+                using (var connection = _context.CreateConnection())
+                {
+                    await connection.ExecuteAsync(query, new { Id = id });
+                    return new ResponseMvc() { Success = true };
+                }
             }
+            catch (Exception ex)
+            {
+
+                return new ResponseMvc(){Message=ex.Message};
+            }
+
         }
 
         public async Task<ResponseMvc> ToExcel(NhanVien[] nhanViens)
@@ -151,16 +143,17 @@ namespace BaiTap_phan3.Services
 
                 int rowIndex = 3;
                 int insertIndex = 8;
-                
+
                 for (int i = 0; i < nhanViens.Length; i++)
                 {
-                    if(rowIndex == insertIndex){
+                    if (rowIndex == insertIndex)
+                    {
                         sheet.InsertRow(insertIndex, 1);
                         insertIndex++;
                         // copy style
                         sheet.Cells[3, 1, 3, 7].Copy(sheet.Cells[rowIndex, 1, rowIndex, 7]);
                     }
-                    sheet.Cells[rowIndex, 1].Value = i+1;
+                    sheet.Cells[rowIndex, 1].Value = i + 1;
                     sheet.Cells[rowIndex, 2].Value = nhanViens[i].Id;
                     sheet.Cells[rowIndex, 3].Value = nhanViens[i].HoVaTen;
                     sheet.Cells[rowIndex, 4].Value = nhanViens[i].NgaySinh.ToString("dd-MM-yyyy");
@@ -171,7 +164,7 @@ namespace BaiTap_phan3.Services
                     rowIndex++;
                 }
                 await excel.SaveAsAsync(destinationpath);
-                return new ResponseMvc() { Success = true, data = destinationpath};
+                return new ResponseMvc() { Success = true, data = destinationpath };
             }
             else
             {

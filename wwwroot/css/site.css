@@ -1,6 +1,5 @@
 html {
   font-size: 14px;
-  background-color: #FFFACD;
 }
 
 @media (min-width: 768px) {
@@ -24,12 +23,22 @@ html {
 
 body {
   margin-bottom: 60px;
-  background-color: #FFFACD;
+  background-color: rgb(221, 230, 238);
 }
 
 .Staff #container-staff-form span {
   position: absolute;
   color: red;
+}
+
+.tool button, .tool span{
+  background-color: rgb(74, 74, 206);
+  color: white;
+}
+
+.tool button:hover, .tool span:hover{
+  background-color: rgb(114, 114, 220);
+  color: white;
 }
 
 .data {
@@ -99,7 +108,7 @@ body {
   position: absolute;
   top: 40px;
   min-width: 150px;
-  background-color: white;
+  background-color: rgb(36, 71, 184);
   z-index: 1;
   animation: down 0.15s linear;
 }
@@ -120,4 +129,30 @@ body {
 
 .dropdown:hover .dropdown-content{
   display: block;
+}
+
+#staff_pagination button{
+  background-color: rgb(74, 74, 206);
+  color: white;
+}
+
+@keyframes leftToRightOut{
+  0%{transform: translateX(0);}
+  100%{transform: translateX(200px);}
+}
+
+@keyframes leftToRightIn{
+  0%{transform: translateX(-200px);}
+  100%{transform: translateX(0);}
+}
+
+
+#container-staff-form input[type = number]{
+  -moz-appearance: textfield;
+}
+
+#container-staff-form input::-webkit-outer-spin-button,
+#container-staff-form input::-webkit-inner-spin-button{
+  -webkit-appearance: none;
+  margin: 0;
 }

@@ -12,10 +12,11 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <script>src = "/lib/jquery/dist/jquery.min.js"</script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
 <body>
-    <header>
+    <header style="position: sticky; top: 0">
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">BaiTap_phan3</a>
@@ -33,10 +34,10 @@
                                 nhân viên</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Department" asp-action="Index">Quản lý phòng ban</a>
+                            <a style="display: none;" class="nav-link text-dark" asp-area="" asp-controller="Department" asp-action="Index">Quản lý phòng ban</a>
                         </li>
                         <li class="nav-item ml-5">
-                            <a id="login-link" class="nav-link text-dark ml-5" asp-area="" asp-controller="Home" asp-action="Login">Login</a>
+                            <a style="display: none;" id="login-link" class="nav-link text-dark ml-5" asp-area="" asp-controller="Home" asp-action="Login">Login</a>
                         </li>
                     </ul>
                 </div>
