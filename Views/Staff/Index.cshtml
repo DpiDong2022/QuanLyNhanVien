@@ -1,33 +1,32 @@
 @using BaiTap_phan3.Models;
+@using BaiTap_phan3.DTO;
+@model BaiTap_phan3.Models.PageResult<NhanVienDto>;
 
 @{
     ViewData["Title"] = "Index";
 }
 
 @{
-
-            //loading...
+    //loading...
     <div class="loading loader--hidden"></div>
-
+    
     // Thanh tìm kiếm
     <div class="container-fluid d-flex align-items-center justify-content-center p-4" style="height: 100px;">
         <input class="form-control-sm" id="searchInput" type="search" style="width: 60%; height: 100%; font-size: large">
-        <button class="btn bg-warning mx-4" id="searchButton" style="height: 90%" onclick="TimKiem()">Tìm kiếm</button>
+        <button class="btn bg-warning mx-4" id="searchButton" style="height: 90%" onclick="TimKiem(true)">Tìm kiếm</button>
     </div>
 
 
     <div class="tool">
         <!--Nút pupup thêm nhân viên-->
         <button class="btn mb-3" id="open-staff-form-btn" data-toggle="modal" data-target="#container-staff-form"
-            onclick="(function(){SelectedMaNhanVien=''})();">Thêm nhân viên <i class="fa fa-plus-circle"></i></button>
+            onclick="ThemNhanVien()">Thêm nhân viên <i class="fa fa-plus-circle"></i></button>
         <!--Nút tải xuống Excel-->
-        <button class="btn ml-3 mb-3" onclick="ExportToExcel()">Xuất thành file excel <i class="fa fa-download"></i></button>
+        <button class="btn ml-3 mb-3" onclick="ExportToExcel()">Xuất thành file excel <i
+                class="fa fa-download"></i></button>
         <!--Nút lọc phòng ban-->
         <div class="phongban dropdown">
-            <span class="btn ml-3 mb-3 mx-1 dropdown-span" style="font-style: italic; text-align: left; min-width: 200px; position: relative">
-                <p style="display: inline;">Phòng ban: --Tất cả-- </p>
-                <i style="position: absolute; right: 12px; top: 30%" class="fa fa-caret-down"></i>
-            </span>
+            <span class="btn ml-3 mb-3 mx-1 dropdown-span" style="font-style: italic;">--Tất cả--</span>
             <div class="dropdown-content ml-3 mx-1">
                 <a data-id="0" onclick="LocPhongBan(0)" style="font-style: italic;">--Tất cả--</a>
             </div>
@@ -47,12 +46,13 @@
                 <th>Thao tác</th>
             </tr>
         </thead>
-        <tbody id="staff-row-container"></tbody>
+        <tbody id="staff-row-container">
+            @Html.Partial("StaffBodyTable", Model)
+        </tbody>
     </table>
 
             // phan trang
-    <div id="staff_pagination" class="list-group list-group-horizontal justify-content-center">pagination</div>
-
+    <div id="staff_pagination" data-totalpage="@Model.TotalPage" class="list-group list-group-horizontal justify-content-center"></div>
 
     <!--modal them nhan vien-->
     <div class="modal fade" id="container-staff-form" tabindex="-1" role="dialog">
@@ -91,13 +91,15 @@
                             <label for="ChuVu">Chức vụ:</label>
                             <input type="text" placeholder="Chức vụ" id="ChucVu" name="ChucVu" class="form-control">
                         </div>
-                        <span id="error-staff-form" class="FormError"></span>
                         <div class="from-group mb-3">
                             <label for="PhongBan">Phòng ban:</label>
-                            <select name="PhongBan" id="phongban-selection" class="form-select">
-                                <option style="font-style: italic;" selected>--Tất cả--</option>
+                            <select required name="PhongBan" id="phongban-selection" class="form-select"
+                                onchange="validateDepartment()">
+                                <option selected value="" style="font-style: italic;">--Tất cả--</option>
                             </select>
+                            <span id="phongBanError" class="mb-0">*Phòng ban là bắt buộc</span>
                         </div>
+                        <span id="error-staff-form" class="FormError"></span>
                     </form>
 
                 </div>
@@ -136,4 +138,5 @@
             </div>
         </div>
     </div>
+
 }

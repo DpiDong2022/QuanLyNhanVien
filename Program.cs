@@ -1,8 +1,7 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using BaiTap_phan3.DBContext;
-using BaiTap_phan3.Interfaces;
-using BaiTap_phan3.Services;
 using BaiTap_phan3.Models;
+using BaiTap_phan3.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,9 +10,9 @@ builder.Services.AddControllersWithViews().AddJsonOptions(
     option => {option.JsonSerializerOptions.PropertyNamingPolicy=null;});
 
 // Use HttpContext
-builder.Services.AddSingleton<DapperContext>();
-builder.Services.AddScoped<INhanVienService, NhanVienService>();
-builder.Services.AddScoped<IPhongBanService, PhongBanService>();
+builder.Services.AddSingleton(typeof(DapperContext<>));
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddSingleton(typeof(NhanVienRepository));
 builder.Services.AddControllers();
 
 // use HttpContext

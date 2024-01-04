@@ -1,18 +1,15 @@
 ﻿
 let SelectedIdNhanVien;
 const RecordAmount = 10;
-let CurrentPage = 1;
 let LocPhongBanId = 0;
 let TotalPage = 0;
-let DanhSachNhanVien = [];
-let ShowedStaff = [];
-let SearchStaff = [];
+let CurrentPage = 1;
 let PhongBanList = [];
+let SearchKey = "";
 
-// lấy danh sach nhan vien và phòng ban
+// khởi chaỵ
 $(document).ready(function () {
-
-    // lấy dữ liệu và render phòng ban element
+    // lấy danh sách phòng ban
     options = {};
     options.url = "Department/GetList";
     options.type = "get";
@@ -20,7 +17,6 @@ $(document).ready(function () {
 
     $.ajax(options).done(function (result) {
         PhongBanList = result;
-
         const phongBan_selection = $("#phongban-selection");
         const phongban_dropdown = $(".phongban .dropdown-content");
 
@@ -34,116 +30,89 @@ $(document).ready(function () {
             phongBan_selection.append(option);
         }
     });
-
-    // lấy dữ liệu và render bảng Nhân viên
-    options = {};
-    options.url = "Staff/List";
-    options.type = "get";
-    options.textContent = "application/json";
-
-    $.ajax(options).done(function (result) {
-        DanhSachNhanVien = result;
-        CurrentPage = 1
-        TimKiem();
-    });
+    renderPageNumber()
 });
 
 function changeCurrentPage(number) {
-    CurrentPage = number;
+    CurrentPage = number; // number = id
     TimKiem();
+}
+
+function ThemNhanVien() {
+    SelectedMaNhanVien = ''
+    if (LocPhongBanId == 0) return;
+    let phongBanTen = PhongBanList.find(c => { return c.Id === LocPhongBanId }).TenPhongBan;
+    $("#phongban-selection").val(phongBanTen);
 }
 
 function LocPhongBan(Id) {
     LocPhongBanId = Id;
-    let phongbanSpanP = $(".phongban .dropdown-span p");
+    let phongbanSpan = $(".phongban .dropdown-span");
     if (Id == 0) {
-        phongbanSpanP.html("Phòng ban: --Tất cả--");
+        phongbanSpan.text("--Tất cả--");
     } else {
         let tenPhongBan = PhongBanList.find(c => c.Id == Id).TenPhongBan;
-        phongbanSpanP.html("Phòng ban: " + tenPhongBan);
+        phongbanSpan.text(tenPhongBan);
     }
     CurrentPage = 1;
     TimKiem();
 }
 
 function renderPageNumber() {
-    document.getElementById("staff_pagination").innerHTML = "" + `<button class="btn mx-1"` +
-        `onclick="changeCurrentPage(${1})">${1}</button>`;
+    TotalPage = $("#hahaa").val();
+    let pagination = document.getElementById("staff_pagination");
+    pagination.innerHTML = "";
 
-    for (let index = 2; index <= TotalPage; index++) {
-        document.getElementById("staff_pagination").innerHTML += `<button class="btn mx-1"` +
-            `onclick="changeCurrentPage(${index})">${index}</button>`;
+    for (let index = 1; index <= TotalPage; index++) {
+        if(index == CurrentPage){
+            pagination.innerHTML += `<button id="${index}" class="btn mx-1"` +
+            `onclick="changeCurrentPage(${index})" style="border:2px solid red">$${index}</button>`;
+        }else{
+            pagination.innerHTML += `<button id="${index}" class="btn mx-1"` +
+            `onclick="changeCurrentPage(${index})">$${index}</button>`;
+        }
     }
 }
 
-function render_staffs() {
-    const table = $("#staff-row-container");
-    table.empty();
-    let row;
-
-    for (nhanVien of ShowedStaff) {
-        row = staff_row(nhanVien.Id, nhanVien.HoVaTen, nhanVien.NgaySinh, nhanVien.DienThoai, nhanVien.ChucVu, nhanVien.PhongBanId);
-        table.append(row);
+function TimKiem(isKeySearchSaved = false) {
+    if (isKeySearchSaved) {
+        SearchKey = $("#searchInput").val().toLowerCase();
     }
-    // dien thong tin tuong ung vao form khi an edit
-    $(".edit-staff-btn").click(fillStaffForm);
-}
-
-function TimKiem() {
-    const searhString = $("#searchInput").val().toLowerCase();
-
-    if (searhString == "" || searhString == null) {
-        SearchStaff = DanhSachNhanVien;
-    } else {
-        const keySplited = searhString.split(" ");
-        SearchStaff = DanhSachNhanVien.filter(nhanVien => {
-            return keySplited.some(c => nhanVien.HoVaTen.toLowerCase().includes(c))
-        });
-    }
-    // lọc phòng ban
-    if (LocPhongBanId != 0) {
-        SearchStaff = SearchStaff.filter(nhanVien => {
-            return nhanVien.PhongBanId === LocPhongBanId;
-        });
+    var options = {};
+    options.url = "Staff/Search";
+    options.type = "get";
+    options.contentType = "application/json";
+    options.data = {
+        keySearch: SearchKey,
+        pageSize: RecordAmount,
+        pageNumber: CurrentPage,
+        phongBanId: LocPhongBanId
     }
 
-    TotalPage = Math.ceil(SearchStaff.length / RecordAmount);
-    ShowedStaff = SearchStaff.slice(
-        (CurrentPage - 1) * RecordAmount,
-        (CurrentPage - 1) * RecordAmount + RecordAmount);
-
-    // render bảng nhân nhiên, nút phân trang
-    render_staffs();
-    renderPageNumber();
+    $.ajax(options).done(function (content) {
+        $("#staff-row-container").html(content);
+        renderPageNumber();
+    });
 }
 
 function staff_row(id, hoVaTen, ngaySinh, dienThoai, chucVu, phongBanId) {
-    var tenPhongBan;
 
-    if (phongBanId == 0 || phongBanId == undefined) {
-        tenPhongBan = "Chưa chọn";
-    }
-    else if (phongBanId != undefined && phongBanId != "") {
+    var PhongBan = PhongBanList.find(item => item.Id == phongBanId);
 
-        let phongBan = PhongBanList.find(item => item.Id == phongBanId);
-        tenPhongBan = phongBan.TenPhongBan;
-        phongBanId = phongBan.Id;
-    }
     if (dienThoai == null || dienThoai == "null") {
         dienThoai = "";
     }
     if (chucVu == null || chucVu == "null") {
         chucVu = "";
     }
-    debugger;
 
     return `<tr id="${id}">
                 <td>${id}</td>
                 <td class="hoten">${hoVaTen}</td>
-                <td class="ngaysinh">${DobFormat(ngaySinh)}</td>
+                <td class="ngaysinh">${DobFormatVN(ngaySinh)}</td>
                 <td>${dienThoai}</td>
                 <td>${chucVu}</td>
-                <td data-id="${phongBanId}">${tenPhongBan}</td>
+                <td data-id="${PhongBan.Id}">${PhongBan.TenPhongBan}</td>
                 <td class="btn-area">
                     <button class="btn bg-warning m-1 edit-staff-btn" data-toggle="modal" 
                         data-target="#container-staff-form" onclick="GiuMaNhanVien(${id})">Sửa</button>
@@ -161,14 +130,10 @@ function fillStaffForm() {
     var department = $("#" + SelectedIdNhanVien).children("td:nth-child(6)").text();
 
     $("#HoVaTen").val(name);
-    $("#DOB").val(Dob);
+    $("#DOB").val(DobFormatEN(Dob));
     $("#DienThoai").val(number);
     $("#ChucVu").val(position);
-
-    if (department != "Chưa chọn") {
-        $("#phongban-selection").val(department);
-    }
-
+    $("#phongban-selection").val(department);
 }
 
 // validate ngay sinh
@@ -188,8 +153,11 @@ function validateDob() {
         $("#DobError").html("*Ngày sinh không hợp lệ, nhân viên chưa đủ 18 tuổi");
         $("#error-staff-form").html("");
         return false;
+    } else if (isStaffExist()) {
+        $("#error-staff-form").html("*Nhân viên đã tồn tại do chùng ngày sinh và họ tên").show();
     } else {
         $("#DobError").hide();
+        $("#error-staff-form").hide();
         return true;
     }
 }
@@ -207,12 +175,25 @@ function validateName() {
     }
 }
 
+// validate department
+function validateDepartment() {
+    const phongBan = $("#phongban-selection option:selected").text();
+    if (phongBan == "--Tất cả--") {
+        $("#phongBanError").show();
+        return false;
+    } else {
+        $("#phongBanError").hide();
+        return true;
+    }
+}
+
 // clear form thêm/sửa nhân viên
 $(document).ready(function () {
     $(".modal").on("hidden.bs.modal", function () {
         document.getElementById("staff-form").reset();
         $("#DobError").hide();
         $("#NameError").hide();
+        $("#phongBanError").hide();
         $("#error-staff-form").hide();
     });
 
@@ -221,16 +202,8 @@ $(document).ready(function () {
 // kiểm tra dữ liệu thêm/sửa
 $(document).ready(function () {
     $("#createBtn").click(function () {
-        if (validateDob() & validateName()) {
-
-            if (isStaffExist()) {
-
-                $("#error-staff-form").html("*Nhân viên đã tồn tại do chùng ngày sinh và họ tên");
-                $("#error-staff-form").show();
-            } else {
-                $("#error-staff-form").hide();
-                updateStaff();
-            }
+        if (validateDob() & validateName() & validateDepartment()) {
+            updateStaff();
         }
     });
 })
@@ -238,7 +211,7 @@ $(document).ready(function () {
 // Kiem tra thông tin nhan vien ở trong form nhân viên da ton tai
 function isStaffExist() {
     let NameInput = $("#HoVaTen").val().toLowerCase();
-    let DobInput = $("#DOB").val();
+    let DobInput = DobFormatVN($("#DOB").val());
 
     var rows = Array.from($("#staff-row-container tr"));
     let name, date, id;
@@ -277,49 +250,31 @@ function updateStaff() {
         id: SelectedIdNhanVien
     };
 
+    $(".loading").removeClass("loader--hidden");
+    $(".loading").addClass("loader");
+
     $.ajax(options).done(function (result) {
-        if (result.Success) {
-            $(".close").click();
-            $(".loading").removeClass("loader--hidden");
-            $(".loading").addClass("loader");
+        debugger
+        // loading trouc khi done request/////////////////
+        $(".loading").addClass("loader--hidden");
+        $(".loader").on("transitionend", function () {
+            $(".loading").removeClass("loader");
+        });
 
-            setTimeout(() => {
-                $(".loading").addClass("loader--hidden");
-            }, 500);
+        $(".close").click();
 
-            $(".loader").on("transitionend", function () {
-                $(".loading").removeClass("loader");
-            });
-
-            setTimeout(() => {
-                id = result.data == null ? SelectedIdNhanVien : result.data;
-                var newRow = staff_row(id, hoTen, Dob, Sdt, chucVu, phongBanId);
-                let nhanVien = {
-                    "Id": id,
-                    "HoVaTen": hoTen,
-                    "NgaySinh": Dob,
-                    "DienThoai": Sdt,
-                    "ChucVu": chucVu,
-                    "PhongBanId": phongBanId
-                };
-                if (SelectedIdNhanVien == undefined) {
-
-                    $(".staff-table").children("tbody").prepend(newRow);
-                    DanhSachNhanVien.push(nhanVien);
-                } else {
-                    $("#" + id).replaceWith(newRow);
-                    index = DanhSachNhanVien.findIndex(function (nhanVien) {
-                        return nhanVien.Id === id
-                    });
-                    DanhSachNhanVien[index] = nhanVien;
-                }
-                $(".staff-table tr#" + id).css("animation", "leftToRightIn 0.3s linear");
-                $(".edit-staff-btn").click(fillStaffForm);
-            }, 600);
-
+        if (result == true) {
+            var newRow = staff_row(SelectedIdNhanVien, hoTen, Dob, Sdt, chucVu, phongBanId);
+            $("#" + SelectedIdNhanVien).replaceWith(newRow);
+            $(".staff-table tr#" + SelectedIdNhanVien).css("animation", "leftToRightIn 0.15s linear");
+        } else if (result == false) {
+            alert("Sua ko thanh cong");
         } else {
-            alert(result.Message);
+            var newRow = staff_row(result, hoTen, Dob, Sdt, chucVu, phongBanId);
+            $(".staff-table").children("tbody").prepend(newRow);
+            $(".staff-table tr#" + result).css("animation", "leftToRightIn 0.15s linear");
         }
+        SelectedIdNhanVien = undefined;
     });
 }
 
@@ -327,17 +282,13 @@ function updateStaff() {
 $(document).ready(function () {
     $("#XoaButton").click(function () {
         var options = {};
-        options.url = "Staff/Delete";
-        options.type = "get";
+        options.url = "Staff/Delete?id=" + SelectedIdNhanVien;
+        options.type = "delete";
         options.contentType = "application/json";
         options.data = {
             id: SelectedIdNhanVien
         };
-
         $.ajax(options).done(function () {
-            index = DanhSachNhanVien.findIndex(c => c.id === SelectedIdNhanVien)
-            DanhSachNhanVien.splice(index, 1);
-
             let deletedRow = $("#" + SelectedIdNhanVien);
             deletedRow.css("animation", "leftToRightOut 0.5s linear");
 
@@ -352,43 +303,20 @@ $(document).ready(function () {
 // lưu mã nhân viên để xóa
 function GiuMaNhanVien(id) {
     SelectedIdNhanVien = id;
+    fillStaffForm()
 }
 
 function ExportToExcel() {
-    let nhanVienss = [];
-
-    for (let nv of SearchStaff) {
-        var phongban = PhongBanList.find(c => c.Id == nv.PhongBanId);
-        if (nv.ChucVu == "null" || nv.ChucVu == null) {
-            nv.ChucVu = "";
-        }
-        if (nv.DienThoai == "null" || nv.DienThoai == null) {
-            nv.DienThoai = "";
-        }
-        var nhanVien = {
-            Id: nv.Id,
-            HoVaTen: nv.HoVaTen,
-            NgaySinh: nv.NgaySinh,
-            DienThoai: nv.DienThoai,
-            ChucVu: nv.ChucVu,
-            PhongBan: {
-                Id: 0,
-                TenPhongBan: phongban == undefined ? "Chưa Chọn" : phongban.TenPhongBan
-            }
-        };
-        nhanVienss.push(nhanVien);
-    };
     var options = {};
     options.url = "Staff/Report";
     options.type = "post";
     options.contentType = "application/json";
-    options.data = JSON.stringify(nhanVienss);
 
-    $.ajax(options).done(function (result) {
-        if (result.Success) {
-            window.location.href = "Staff/Download?filePath=" + result.data + "&fileName=BaoCaoNhanVien.xlsx";
+    $.ajax(options).done(function (filePath) {
+        if (filePath = "" & filePath != null) {
+            window.location.href = "Staff/Download?filePath=" + filePath + "&fileName=BaoCaoNhanVien.xlsx";
         } else {
-            alert(result.Message);
+            alert("fail to download excel file");
         }
     });
 }
@@ -398,11 +326,22 @@ $(document).ready(function () {
     $("#searchInput").on("keyup", function (event) {
         if (event.key === "Enter") {
             CurrentPage = 1;
-            TimKiem();
+            TimKiem(true);
         }
     });
 });
 
-function DobFormat(dateTime) {
-    return String(dateTime).substring(0, 10);
+function DobFormatEN(dateTime) {
+    var ngay = dateTime.substring(0, 2);
+    var thang = dateTime.substring(3, 5);
+    var nam = dateTime.substring(6, 11);
+    return nam + "-" + thang + "-" + ngay;
+}
+
+function DobFormatVN(dateTime) {
+
+    var ngay = dateTime.substring(8, 11);
+    var thang = dateTime.substring(5, 7);
+    var nam = dateTime.substring(0, 4);
+    return ngay + "-" + thang + "-" + nam;
 }

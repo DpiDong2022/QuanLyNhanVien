@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ADMIN\\Desktop\\VietGis_baiTap\\BaiTap-phan3\\BaiTap-phan3.csproj": {}
+    "c:\\Users\\ADMIN\\Desktop\\VietGis_baiTap\\BaiTap-phan3\\BaiTap-phan3.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ADMIN\\Desktop\\VietGis_baiTap\\BaiTap-phan3\\BaiTap-phan3.csproj": {
+    "c:\\Users\\ADMIN\\Desktop\\VietGis_baiTap\\BaiTap-phan3\\BaiTap-phan3.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ADMIN\\Desktop\\VietGis_baiTap\\BaiTap-phan3\\BaiTap-phan3.csproj",
+        "projectUniqueName": "c:\\Users\\ADMIN\\Desktop\\VietGis_baiTap\\BaiTap-phan3\\BaiTap-phan3.csproj",
         "projectName": "BaiTap-phan3",
-        "projectPath": "C:\\Users\\ADMIN\\Desktop\\VietGis_baiTap\\BaiTap-phan3\\BaiTap-phan3.csproj",
+        "projectPath": "c:\\Users\\ADMIN\\Desktop\\VietGis_baiTap\\BaiTap-phan3\\BaiTap-phan3.csproj",
         "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ADMIN\\Desktop\\VietGis_baiTap\\BaiTap-phan3\\obj\\",
+        "outputPath": "c:\\Users\\ADMIN\\Desktop\\VietGis_baiTap\\BaiTap-phan3\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",

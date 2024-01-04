@@ -12,8 +12,7 @@ namespace BaiTap_phan3.Models
         public DateTime NgaySinh { get; set; }
         public string? DienThoai { get; set; }
         public string? ChucVu { get; set; }
-        public int? PhongBanId { get; set; }=0;
-        public PhongBan? PhongBan {get; set;}
+        public int PhongBanId {get; set;}
         #endregion
 
 
@@ -21,12 +20,13 @@ namespace BaiTap_phan3.Models
         public NhanVien()
         {
         }
-        public NhanVien(string hoVaTen, DateTime ngaySinh, string soDienThoai, string chucVu)
+        public NhanVien(string hoVaTen, DateTime ngaySinh, string soDienThoai, string chucVu, int phongBanId)
         {
             HoVaTen = hoVaTen;
             NgaySinh = ngaySinh;
             DienThoai = soDienThoai;
             ChucVu = chucVu;
+            PhongBanId = phongBanId;
         }
 
         #endregion

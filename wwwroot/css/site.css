@@ -47,6 +47,7 @@ body {
 
 #DobError,
 #NameError,
+#phongBanError,
 .FormError {
   display: none;
   color: red;
@@ -55,6 +56,7 @@ body {
 }
 
 .loader {
+  z-index: 10000;
   position: fixed;
   top: 0;
   left: 0;

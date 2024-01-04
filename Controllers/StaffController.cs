@@ -1,36 +1,41 @@
 using Microsoft.AspNetCore.Mvc;
 using BaiTap_phan3.Models;
 using BaiTap_phan3.Response;
-using BaiTap_phan3.Interfaces;
 using BaiTap_phan3.DTO;
+using BaiTap_phan3.Repository;
+using Newtonsoft.Json;
 
 namespace BaiTap_phan3.Controllers
 {
 
     public class StaffController : Controller
     {
-        private readonly INhanVienService _nhanVienService;
+        private readonly NhanVienRepository _repositoryNhanVien;
+        private readonly IGenericRepository<PhongBan> _repositoryPhongBan;
         private ILogger<StaffController> _logger;
-        public StaffController(INhanVienService nhanVienService, ILogger<StaffController> logger)
+        public StaffController(NhanVienRepository repositoryNhanVien, IGenericRepository<PhongBan> repositoryPhongBan,ILogger<StaffController> logger)
         {
-            _nhanVienService = nhanVienService;
+            _repositoryNhanVien = repositoryNhanVien;
+            _repositoryPhongBan = repositoryPhongBan;
             _logger = logger;
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
-
+             IEnumerable<NhanVienDto> nhanVienDtos =  await TimKiem(keySearch:"", pageSize: 10, pageNumber: 1, null);
+            TempData["NhanVienInfor"] = JsonConvert.SerializeObject(nhanVienDtos);
+            PageResult<NhanVienDto> result = new PageResult<NhanVienDto>(nhanVienDtos, 10, 1);
+            return View(result);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(NhanVienDto nhanVien)
+        public async Task<IActionResult> Create(NhanVien nhanVien)
         {
             try
             {
-                var result = await _nhanVienService.Them(nhanVien);
-                return Ok(result);
+                var result = await _repositoryNhanVien.Insert(nhanVien);
+                return Json(result);
             }
             catch (Exception ex)
             {
@@ -40,37 +45,44 @@ namespace BaiTap_phan3.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(int id, NhanVienDto nhanVien) //input value from asp-rout-maNhanVien
+        public async Task<IActionResult> Edit(int id, NhanVien nhanVien) //input value from asp-rout-maNhanVien
         {
-            ResponseMvc result = await _nhanVienService.Sua(id, nhanVien);
+            nhanVien.Id = id;
+            bool result = await _repositoryNhanVien.Update(id, nhanVien);
             return Json(result);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(NhanVienDto nhanVien, int id = -1)
+        public async Task<object> Update(NhanVien nhanVien, int? id)
         {
-            if (id == -1)
+
+            Thread.Sleep(500);
+            if (id == null)
             {
                 return await Create(nhanVien);
             }
             else
             {
-                return await Edit(id, nhanVien);
+                return await Edit((int)id, nhanVien);
             }
 
         }
 
-        [HttpGet]
+        [HttpDelete]
         public async Task Delete(int id)
         {
-            await _nhanVienService.Xoa(id);
+            await _repositoryNhanVien.Delete(id);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Report([FromBody] NhanVien[] nhanViens)
+        public async Task<IActionResult> Report()
         {
-            var result = await _nhanVienService.ToExcel(nhanViens);
-            return Json(result);
+            IEnumerable<NhanVienDto> ?nhanVienDtos = JsonConvert.DeserializeObject<IEnumerable<NhanVienDto>>(TempData["NhanVienInfor"].ToString());
+            if(nhanVienDtos != null){
+                var filePath = _repositoryNhanVien.ToExcel(nhanVienDtos);
+                return Json(filePath);
+            }
+            return BadRequest();
         }
 
         [HttpGet]
@@ -80,12 +92,38 @@ namespace BaiTap_phan3.Controllers
             return File(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
-
         [HttpGet]
-        public async Task<IActionResult> List()
-        {
-            IEnumerable<NhanVien> result = await _nhanVienService.GetList();
-            return Json(result);
+        public async Task<IActionResult> Search(string keySearch, int pageSize, int pageNumber, int? phongBanId){
+            if(phongBanId == 0) phongBanId = null;
+            IEnumerable<NhanVienDto> nhanVienDtos =  await TimKiem(keySearch:keySearch, pageSize: pageSize, pageNumber: pageNumber, phongBanId);
+            TempData["NhanVienInfor"] = JsonConvert.SerializeObject(nhanVienDtos);
+            PageResult<NhanVienDto> result = new PageResult<NhanVienDto>(nhanVienDtos, pageSize, pageNumber);
+            
+            return PartialView("StaffBodyTable", result);
+        }
+
+        private async Task<IEnumerable<NhanVienDto>> TimKiem(string keySearch, int pageSize=10, int pageNumber=1, int? phongBanId = null){
+            IEnumerable<NhanVien> nhanViens = await _repositoryNhanVien.GetAll();
+            if(!string.IsNullOrEmpty(keySearch)){
+                string[] keySplited = keySearch.Split(' '); 
+                nhanViens = nhanViens.Where(nv => keySplited.Any(key => nv.HoVaTen.ToLower().Contains(key)));
+            }
+
+            if(phongBanId != null){
+                nhanViens = nhanViens.Where(nv => nv.PhongBanId == phongBanId);
+            }
+
+            IEnumerable<PhongBan> phongBans = await _repositoryPhongBan.GetAll();
+            IEnumerable<NhanVienDto> nhanVienDtos = nhanViens.Select(nv => new NhanVienDto(){
+                Id = nv.Id,
+                HoVaTen = nv.HoVaTen,
+                NgaySinh = nv.NgaySinh,
+                DienThoai = nv.DienThoai,
+                ChucVu = nv.ChucVu,
+                PhongBan = phongBans.First(pb => pb.Id == nv.PhongBanId)
+            });
+
+            return nhanVienDtos;
         }
     }
 }
