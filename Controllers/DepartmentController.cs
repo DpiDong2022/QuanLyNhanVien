@@ -1,11 +1,13 @@
 using System;
 using BaiTap_phan3.DBContext;
-using BaiTap_phan3.Repository;
+using BaiTap_phan3.Contracts.Repositories;
 using BaiTap_phan3.Models;
 using Microsoft.AspNetCore.Mvc;
+using BaiTap_phan3.Filters;
 
 namespace BaiTap_phan3.Controllers
 {
+     [MyActionFilter]
     public class DepartmentController : Controller
     {
         private readonly IGenericRepository<PhongBan> _repositoryPhongBan;
@@ -23,17 +25,8 @@ namespace BaiTap_phan3.Controllers
         [HttpGet]
         public async Task<IActionResult> GetList()
         {
-            try
-            {
-                var result = await _repositoryPhongBan.GetAll();
+           var result = await _repositoryPhongBan.GetAll() as IEnumerable<PhongBan>;
                 return Json(result);
-            }
-            catch (System.Exception ex)
-            {
-
-                throw;
-            }
-
         }
     }
 }

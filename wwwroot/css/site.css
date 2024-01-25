@@ -23,7 +23,6 @@ html {
 
 body {
   margin-bottom: 60px;
-  background-color: rgb(221, 230, 238);
 }
 
 .Staff #container-staff-form span {
@@ -31,28 +30,45 @@ body {
   color: red;
 }
 
-.tool button, .tool span{
+.tool button,
+.tool select {
   background-color: rgb(74, 74, 206);
   color: white;
+  height: 40px;
+  width: 183px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  border: 1px solid rgb(74, 74, 206);
+  margin-right: 10px;
+  text-align: center;
 }
 
-.tool button:hover, .tool span:hover{
+.tool select option {
+  height: 38px;
+  padding-top: 15px;
+  padding-top: 15px;
+}
+
+.tool select option:hover {
+  background-color: aliceblue;
+  color: black;
+}
+
+.tool button:hover,
+.tool select:hover {
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+
+.tool button:hover,
+.tool span:hover {
   background-color: rgb(114, 114, 220);
   color: white;
 }
 
 .data {
   border-radius: 10px;
-}
-
-#DobError,
-#NameError,
-#phongBanError,
-.FormError {
-  display: none;
-  color: red;
-  font-size: small;
-  font-weight: bold;
 }
 
 .loader {
@@ -68,19 +84,19 @@ body {
   transition: opacity 0.5s, visibility 0.5s;
 }
 
-.loader--hidden{
+.loader--hidden {
   opacity: 0;
   visibility: hidden;
 }
 
-.loader::after{
+.loader::after {
   height: 150px;
   width: 150px;
   content: "";
   border: 12px solid lightblue;
   border-bottom: 12px solid black;
   border-radius: 50%;
-  animation: spin 0.5s ease infinite;
+  animation: spin 0.5s ease-in-out infinite;
 }
 
 @keyframes spin {
@@ -95,17 +111,22 @@ body {
   }
 }
 
-@keyframes down{
-  0%{transform: translateX(80px);}
-  100%{transform: translateX(0);}
+@keyframes down {
+  0% {
+    transform: translateX(80px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
 }
 
-.dropdown{
+.dropdown {
   position: relative;
   display: inline-block;
 }
 
-.dropdown-content{
+.dropdown-content {
   display: none;
   position: absolute;
   top: 40px;
@@ -115,7 +136,7 @@ body {
   animation: down 0.15s linear;
 }
 
-.dropdown-content a{
+.dropdown-content a {
   padding: 10px;
   background-color: white;
   text-decoration: none;
@@ -123,38 +144,131 @@ body {
   cursor: pointer;
 }
 
-.dropdown-content a:hover{
+.dropdown-content a:hover {
   color: white;
   background-color: rgb(202, 202, 230);
   border: 1px solid black;
 }
 
-.dropdown:hover .dropdown-content{
+.dropdown:hover .dropdown-content {
   display: block;
 }
 
-#staff_pagination button{
+#staff_pagination button {
   background-color: rgb(74, 74, 206);
   color: white;
 }
 
-@keyframes leftToRightOut{
-  0%{transform: translateX(0);}
-  100%{transform: translateX(200px);}
+
+/* warning */
+.warning-container{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
-@keyframes leftToRightIn{
-  0%{transform: translateX(-200px);}
-  100%{transform: translateX(0);}
+.warning-popup{
+  background-color: #ffffff;
+  border-radius: 4px;
+  padding: 20px;
+  width: 350px;
+  box-shadow: 4px 3px 10px #888888;
+  transition: all 300ms ease-in-out 0ms;
+  display: none;
+}
+
+.warning-popup button, .warning-popup p{
+  display: block;
+}
+
+.warning-popup .fa-check{
+  display: none;
+}
+
+.warning-popup .fa-ban{
+  color: red;
+  font-size: 90px;
+}
+
+.warninging-popup .icon-container,.icon, .warning-popup .button-container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.warning-popup i{
+  font-size: 70px;
+}
+
+.warning-popup p{
+  text-align: center;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.warning-popup .button-container{
+  margin-top: 20px;
+}
+
+.warning-popup button{
+  width: 90px;
+  height: 37px;
+  background-color: white;
+  border-radius: 4px;
+  border: 1px solid rgb(190, 188, 188);
+}
+
+.warning-popup button:hover{
+  border: 1px solid rgb(0, 0, 0);
+}
+
+.warning-popup p{
+  line-height: 25px;
+}
+
+.warning-popup button:active{
+  background-color: rgb(50, 50, 191);
+  color: white;
+}
+
+@keyframes righto {
+  0%{transform: translateX(500px);}
+  100%{transform: translateX(0px);}
+}
+
+@keyframes leftToRightOut {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(200px);
+  }
+}
+
+@keyframes leftToRightIn {
+  0% {
+    transform: translateX(-200px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
 }
 
 
-#container-staff-form input[type = number]{
+#container-staff-form input[type=number] {
   -moz-appearance: textfield;
 }
 
 #container-staff-form input::-webkit-outer-spin-button,
-#container-staff-form input::-webkit-inner-spin-button{
+#container-staff-form input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+.dong-header div {
+  color: white;
+  display: block;
 }

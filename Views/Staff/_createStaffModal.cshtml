@@ -1,0 +1,58 @@
+@model BaiTap_phan3.Models.NhanVien;
+
+
+<form data-id="" data-mode="" asp-action="Create" method="post" class="container bg-light px-0 form" id="staff-form" name="staff-form"
+    style="max-width: 500px;" autocomplete="off">
+    <input style="display: none;" type="text" id="Id" asp-for="Id" name="Id" class="form-control">
+    <div class="form-group mb-3">
+        <label asp-for="HoVaTen"></label>
+        <input type="text" id="HoVaTen" asp-for="HoVaTen" name="HoVaTen" class="form-control"
+            onkeyup="Validate_HoTen()">
+        <span asp-validation-for="HoVaTen" class="error-holder" id="NameError"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="NgaySinh"></label>
+        <input type="date" id="NgaySinh" asp-for="NgaySinh" name="NgaySinh" class="form-control" value="1911-01-01"
+            onchange="Validate_NgaySinh()">
+        <span asp-validation-for="NgaySinh" class="error-holder" id="DobError"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="DienThoai"></label>
+        <input asp-for="DienThoai" id="DienThoai" name="DienThoai" type="number" min="0" max="99999999999"
+            class="form-control">
+        <span asp-validation-for="DienThoai" class="error-holder"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="ChucVu"></label>
+        <input asp-for="ChucVu" type="text" id="ChucVu" name="ChucVu" class="form-control">
+        <span asp-validation-for="ChucVu" class="error-holder"></span>
+    </div>
+
+    <div class="from-group mb-3">
+        <label asp-for="PhongBanId"></label>
+        <select asp-for="PhongBanId" id="phongban-selection-form" class="form-select" onchange="Validate_PhongBan()">
+            <option name="PhongBanId" selected value=-1 style="font-style: italic;">--Tất cả--</option>
+            @foreach (PhongBan phongBan in ViewBag.PhongBans)
+            {
+                <option name="PhongBanId" data-id="@phongBan.Id" value="@phongBan.Id">
+                    @phongBan.TenPhongBan
+                </option>
+            }
+        </select>
+        <span asp-validation-for="PhongBanId" class="error-holder" id="phongBanError"></span>
+    </div>
+
+    <span id="error-staff-form" class="error-holder"></span>
+    <div class="row px-3 pb-3">
+        <div class="col">
+            <button type="submit" class="btn btn-primary container-fluid" id="save-staff-btn">Lưu</button>
+        </div>
+
+        <div class="col">
+            <button class=" btn btn-danger container-fluid" data-dismiss="modal">Hủy</button>
+        </div>
+    </div>
+</form>

@@ -7,6 +7,7 @@ using System.Reflection;
 using Microsoft.VisualBasic;
 using OfficeOpenXml.Utils;
 using System.Diagnostics;
+using BaiTap_phan3.Models;
 
 namespace BaiTap_phan3.DBContext
 {
@@ -17,7 +18,7 @@ namespace BaiTap_phan3.DBContext
         private readonly string? _connectionString;
         private readonly string _keyColumnName;
         private readonly string _tableName;
-        private readonly string[] _thuocTinhs;
+        private readonly List<string> _thuocTinhs;
 
         public DapperContext(IConfiguration configuration)
         {
@@ -38,21 +39,47 @@ namespace BaiTap_phan3.DBContext
             _tableName = typeof(T).FullName.Split('.').Last();
 
             // lấy tên các thuộc tính
-            _thuocTinhs = typeof(T).GetProperties().Select(thuocTinh => thuocTinh.Name).ToArray();
+            _thuocTinhs = typeof(T).GetProperties().Select(thuocTinh => thuocTinh.Name).ToList();
+            for (int index = 0; index < _thuocTinhs.Count(); index++)
+            {
+                if (_thuocTinhs[index].ToLower().Contains("id"))
+                {
+                    for (int index2 = index+1; index2 < _thuocTinhs.Count(); index2++)
+                    {
+                        if (_thuocTinhs[index].ToLower().Contains(_thuocTinhs[index2].ToLower()))
+                        {
+                            _thuocTinhs.RemoveAt(index2);
+                        }
+                    }
+                }
+
+            }
         }
         public IDbConnection CreateConnection() =>
             new NpgsqlConnection(_connectionString);
 
-        public async Task<IEnumerable<T>> GetAll()
+
+        public async Task<List<T>> GetAll()
+        {
+                using (var connection = CreateConnection())
+                {
+                    string sql = "select * from \"" + _tableName + "\" ORDER BY \"Id\" DESC";
+                    List<T> values = connection.QueryAsync<T>(sql).Result.ToList();
+
+                    return values;
+                }
+        }
+
+        public async Task<T> GetById(object id)
         {
             try
             {
                 using (var connection = CreateConnection())
                 {
-                    string sql = "select * from \"" + _tableName + "\"";
+                    string sql = "select * from \"" + _tableName + "\" where \"" + _keyColumnName + "\"=" + id.ToString() + " LIMIT 1";
                     IEnumerable<T> values = await connection.QueryAsync<T>(sql);
 
-                    return values;
+                    return values.First();
                 }
             }
             catch (System.Exception)
@@ -61,10 +88,8 @@ namespace BaiTap_phan3.DBContext
             }
         }
 
-        public async Task<bool> Update(object id, T obj)
+        public async Task<T> Update(object id, T obj)
         {
-            try
-            {
                 string sql = "update \"" + _tableName + "\" set ";
                 foreach (string thuocTinh in _thuocTinhs)
                 {
@@ -73,28 +98,17 @@ namespace BaiTap_phan3.DBContext
                 sql = sql.Remove(sql.Length - 1, 1);
                 sql += " where \"" + _keyColumnName + "\" = " + id.ToString();
 
+                //sql += " returning (select * From \""+_tableName+"\" where \""+_keyColumnName+"\"="+id+" LiMIT 1)" ;
+
                 using (var connection = CreateConnection())
                 {
-                    int rowAffected = await connection.ExecuteAsync(sql, obj);
-                    if (rowAffected > 0)
-                    {
-                        return true;
-                    }
-                    return false;
+                    int rowEffected = connection.Execute(sql, obj);
+                    return await GetById(id);
                 }
-
-            }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
         }
 
         public async Task<bool> Delete(object id)
         {
-            try
-            {
                 string sql = "Delete from \"" + _tableName + "\" where \"" + _keyColumnName + "\"=" + id.ToString();
                 using (var connection = CreateConnection())
                 {
@@ -105,18 +119,10 @@ namespace BaiTap_phan3.DBContext
                     }
                     return false;
                 }
-            }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
         }
 
-        public async Task<object> Insert(T obj)
+        public async Task<T> Insert(T obj)
         {
-            try
-            {
                 string sql = "insert into \"" + _tableName + "\"(";
                 foreach (string tenThuocTinh in _thuocTinhs)
                 {
@@ -140,18 +146,12 @@ namespace BaiTap_phan3.DBContext
                 sql += ") returning \"" + _keyColumnName + "\"";
 
 
+
                 using (var connection = CreateConnection())
                 {
                     int id = connection.QuerySingle<int>(sql, obj);
-                    return id;
+                    return await GetById(id);
                 }
-
-            }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
         }
 
     }

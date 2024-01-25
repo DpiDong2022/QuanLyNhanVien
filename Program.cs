@@ -1,7 +1,11 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using BaiTap_phan3.DBContext;
 using BaiTap_phan3.Models;
-using BaiTap_phan3.Repository;
+using BaiTap_phan3.Contracts.Repositories;
+using Microsoft.AspNetCore.Identity;
+using System.Net;
+using Microsoft.AspNetCore.Diagnostics;
+using BaiTap_phan3.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,8 +16,8 @@ builder.Services.AddControllersWithViews().AddJsonOptions(
 // Use HttpContext
 builder.Services.AddSingleton(typeof(DapperContext<>));
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-builder.Services.AddSingleton(typeof(NhanVienRepository));
-builder.Services.AddControllers();
+builder.Services.AddScoped(typeof(IStaffRepository<NhanVien>), typeof(StaffRepository));
+builder.Services.AddControllers(cfg => cfg.Filters.Add(typeof(MyActionFilter)));
 
 // use HttpContext
 
@@ -29,9 +33,16 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    //app.UseExceptionHandler("/Staff/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    //app.UseHsts();
+    app.UseExceptionHandler(options => options.Run(async context =>{
+        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+        var ex = context.Features.Get<IExceptionHandlerFeature>();
+        if(ex != null){
+            await context.Response.WriteAsync("Internal server error: " +"\n" +ex.Error.Message);
+        }
+    }));
 }
 
 app.UseHttpsRedirection();
@@ -45,6 +56,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Staff}/{action=Index}/{id?}");
 
 app.Run();

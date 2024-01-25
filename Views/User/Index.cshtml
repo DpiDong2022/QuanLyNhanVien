@@ -1,0 +1,33 @@
+@using BaiTap_phan3.Models
+@using static BaiTap_phan3.Models.User
+@{
+    ViewData["Title"] = "User-Index";
+    int index = 0;
+}
+
+@{
+    <div class="Tool-container">
+        <button class="add-btn btn"><input action="Create" type="Add"></button>
+    </div>
+    <table class="table user-table">
+        <thead>
+            <th>STT</th>
+            <th>Id</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Created date</th>
+            <th>Is active</th>
+        </thead>
+        <tbody>
+            @foreach (User user in ViewBag.Users)
+            {
+                <tr>@index++</tr>
+                <tr>@user.Id</tr>
+                <tr>@user.FirstName</tr>
+                <tr>@user.LastName</tr>
+                <tr>@user.CreateDate</tr>
+                <tr>@user.IsActive</tr>
+            }
+        </tbody>
+    </table>
+}

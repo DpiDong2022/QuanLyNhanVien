@@ -9,53 +9,69 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = BaiTap_phan3
 build_property.RootNamespace = BaiTap_phan3
-build_property.ProjectDir = c:\Users\ADMIN\Desktop\VietGis_baiTap\BaiTap-phan3\
+build_property.ProjectDir = C:\Users\ADMIN\Desktop\VietGis_baiTap\BaiTap-phan3\
 build_property.RazorLangVersion = 7.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = c:\Users\ADMIN\Desktop\VietGis_baiTap\BaiTap-phan3
+build_property.MSBuildProjectDirectory = C:\Users\ADMIN\Desktop\VietGis_baiTap\BaiTap-phan3
 build_property._RazorSourceGeneratorDebug = 
 
-[c:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/Department/Index.cshtml]
+[C:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/Department/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVwYXJ0bWVudFxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[c:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/Home/Index.cshtml]
+[C:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[c:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/Home/Login.cshtml]
+[C:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/Home/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[c:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/Home/Privacy.cshtml]
+[C:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[c:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/Shared/Error.cshtml]
+[C:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[c:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/Shared/_ValidationScriptsPartial.cshtml]
+[C:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[c:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/Staff/Index.cshtml]
+[C:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/Staff/Detail.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3RhZmZcRGV0YWlsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/Staff/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3RhZmZcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[c:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/Staff/StaffBodyTable.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3RhZmZcU3RhZmZCb2R5VGFibGUuY3NodG1s
+[C:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/Staff/_createStaffModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3RhZmZcX2NyZWF0ZVN0YWZmTW9kYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[c:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/_ViewImports.cshtml]
+[C:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/Staff/_staffBodyTable.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3RhZmZcX3N0YWZmQm9keVRhYmxlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/User/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/User/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[c:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/_ViewStart.cshtml]
+[C:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[c:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/Shared/_Layout.cshtml]
+[C:/Users/ADMIN/Desktop/VietGis_baiTap/BaiTap-phan3/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-xs8gka7wcc
