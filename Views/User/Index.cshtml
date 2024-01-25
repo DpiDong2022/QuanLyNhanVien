@@ -21,12 +21,14 @@
         <tbody>
             @foreach (User user in ViewBag.Users)
             {
-                <tr>@index++</tr>
-                <tr>@user.Id</tr>
-                <tr>@user.FirstName</tr>
-                <tr>@user.LastName</tr>
-                <tr>@user.CreateDate</tr>
-                <tr>@user.IsActive</tr>
+                <td>
+                    <tr>@index++</tr>
+                    <tr>@user.Id</tr>
+                    <tr>@user.FirstName</tr>
+                    <tr>@user.LastName</tr>
+                    <tr>@user.CreateDate</tr>
+                    <tr>@user.IsActive</tr>
+                </td>
             }
         </tbody>
     </table>

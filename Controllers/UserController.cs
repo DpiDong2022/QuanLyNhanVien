@@ -8,10 +8,10 @@ namespace MessageApps2.Controllers{
 
     public class UserController: Controller{
         private readonly AppDbContext _appDbContext;
-
-        public UserController()
+        public UserController(IConfiguration configuration)
         {
-            _appDbContext = new AppDbContext();
+
+            _appDbContext = new AppDbContext(configuration);
         }
 
         public IActionResult Index(){

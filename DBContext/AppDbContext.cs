@@ -6,12 +6,12 @@ using Microsoft.Extensions.Options;
 namespace MessageApp2.DATA{
 
     public class AppDbContext: DbContext{
-        // private readonly IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
 
-        // protected AppDbContext(IConfiguration configuration)
-        // {   
-        //     _configuration = configuration;
-        // }
+        public AppDbContext(IConfiguration configuration)
+        {   
+            _configuration = configuration;
+        }
 
         public DbSet<User> Users {get; set;}
         public DbSet<Message> Messages {get; set;}
@@ -19,8 +19,8 @@ namespace MessageApp2.DATA{
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //optionsBuilder.UseNpgsql(_configuration.GetConnectionString("DefaultConnection"));
-            optionsBuilder.UseNpgsql("server = localhost; Port = 5433; User Id = postgres; password = admin; database = MessageApp");
+            optionsBuilder.UseNpgsql(_configuration.GetConnectionString("MessageApp"));
+            //optionsBuilder.UseNpgsql("server = localhost; Port = 5433; User Id = postgres; password = admin; database = MessageApp");
         }
     }
 }

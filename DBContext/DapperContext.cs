@@ -23,7 +23,7 @@ namespace BaiTap_phan3.DBContext
         public DapperContext(IConfiguration configuration)
         {
             _configuration = configuration;
-            _connectionString = _configuration.GetConnectionString("DefaultConnection");
+            _connectionString = _configuration.GetConnectionString("NhanVien");
 
             // lấy tên khóa chính
             foreach (PropertyInfo Info in typeof(T).GetProperties())
