@@ -25,10 +25,6 @@
       "PackagePath": "staticwebassets\\js\\site.js"
     },
     {
-      "Id": "C:\\Users\\ADMIN\\Desktop\\VietGis_baiTap\\BaiTap-phan3\\wwwroot\\js\\site2.js",
-      "PackagePath": "staticwebassets\\js\\site2.js"
-    },
-    {
       "Id": "C:\\Users\\ADMIN\\Desktop\\VietGis_baiTap\\BaiTap-phan3\\wwwroot\\lib\\bootstrap\\LICENSE",
       "PackagePath": "staticwebassets\\lib\\bootstrap"
     },
