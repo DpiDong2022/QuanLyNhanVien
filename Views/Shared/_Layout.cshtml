@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using BaiTap_phan3.Models;
+@using static BaiTap_phan3.Models.User;
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -13,7 +15,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <script>src = "/lib/jquery/dist/jquery.min.js"</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    
+
 </head>
 
 <body>
@@ -31,16 +33,19 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a id="staff-link" class="nav-link text-dark" asp-area="" asp-controller="Staff" asp-action="Index">Quản lý
-                                nhân viên</a>
+                            <a id="staff-link" class="nav-link text-dark" asp-area="" asp-controller="Home"
+                                asp-action="Login">
+                                @ViewBag.log</a>
                         </li>
-                         <li class="nav-item">
-                            <a id="staff-link" class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Index">
-                                User</a>
-                        </li>
+                        @RenderSection("nav", required: false)
                         <p style="margin-left:100px" class="my-auto">@ViewBag.message</p>
                     </ul>
+
+                    <div style="color: green;">
+                        <p class="AccountName">as</p>
+                    </div>
                 </div>
+
             </div>
         </nav>
     </header>
@@ -58,6 +63,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    @RenderSection("jsHome", required: false);
 
     <!--for modal-->
     <!-- jQuery library -->
@@ -67,6 +73,7 @@
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    
 </body>
 
 </html>

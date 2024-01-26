@@ -18,7 +18,7 @@ builder.Services.AddSingleton(typeof(DapperContext<>));
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped(typeof(IStaffRepository<NhanVien>), typeof(StaffRepository));
 builder.Services.AddControllers(cfg => cfg.Filters.Add(typeof(MyActionFilter)));
-
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 // use HttpContext
 
 // for session
@@ -56,6 +56,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Staff}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Login}/{id?}");
 
 app.Run();

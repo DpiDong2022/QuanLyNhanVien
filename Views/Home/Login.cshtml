@@ -1,21 +1,22 @@
+@model BaiTap_phan3.Models.LoginModel;
+
 @{
-    ViewData["Title"] = "Login Page";
+    ViewData["Title"] = "Login";
+    ViewBag.log = "Login";
 }
 
 <div class="container" style="width: 50%;">
-    <form id="login-form" action="">
+    <form id="login-form" asp-controller="Home" asp-action="Login" method="post">
         <div class="form-group mb-3">
-            <label for="user-name">User name:</label>
-            <input type="text" id="user-name" name="user-name" class="form-control">
+            <label asp-for="AccountName"></label>
+            <input type="text" asp-for="AccountName" class="form-control">
+            <span asp-validation-for="AccountName"></span>
         </div>
         <div class="form-group mb-3">
-            <label for="pass">Password:</label>
-            <input type="text" id="pass" name="pass" class="form-control" required>
+            <label asp-for="Password"></label>
+            <input type="password" asp-for="Password" class="form-control">
+            <span asp-validation-for="Password"></span>
         </div>
-        <div class="form-group mb-3">
-            <label for="cpass">Confirm Password:</label>
-            <input type="text" id="cpass" name="cpass" class="form-control" required>
-        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
     </form>
-    <button id="submit-login-btn" class="btn btn-primary" onclick="OpenStaff()">Submit</button>
 </div>

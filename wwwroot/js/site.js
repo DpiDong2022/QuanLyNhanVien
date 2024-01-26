@@ -90,11 +90,12 @@ function Search() {
     // get department id
     // get pagination number
     // get key search
+    debugger;
     let _phongBanId = $("#phongban-filter").val();
     let key = $("#search-input").val().toLowerCase();
     let _pageSize = 8;
     $.ajax({
-        url: "Staff/Search",
+        url: "/Staff/Search",
         type: "get",
         contentType: "application/json",
         data: {
@@ -104,12 +105,16 @@ function Search() {
             PageNumber: SelectedPageNumber
         },
         success: function (response) {
+            debugger;
             if(response.Code == 200){
                 $("#staff-container").html(response.Data);
                 rend_page_number();
             }else{
                 DisplayError("Tìm Kiếm", response)
             }
+        },
+        error: function(error){
+            alert(error)
         }
     });
 }
@@ -150,7 +155,7 @@ function create_or_update() {
     let mode = staff_form.getAttribute("data-mode");
 
     $.ajax({
-        url: "Staff/" + mode,
+        url: "/Staff/" + mode,
         type: "POST",
         data: new FormData(staff_form),
         processData: false,
@@ -238,7 +243,7 @@ function rend_page_number() {
     for (let index = 1; index <= totalPage; index++) {
         if (index == SelectedPageNumber) {
             pagination.innerHTML += `<button id="${index}" class="btn mx-1"` +
-                `onclick="changeCurrentPage(${index})" style="border:2px solid red; background-color:white">${index}</button>`;
+                ` style="border:2px solid red; background-color:white">${index}</button>`;
         } else {
             pagination.innerHTML += `<button id="${index}" class="btn mx-1"` +
                 `>${index}</button>`;

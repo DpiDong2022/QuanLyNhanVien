@@ -24,7 +24,7 @@ namespace BaiTap_phan3.Filters
             {
                 Code = 500,
                 Status = "Internal server error",
-                Message = context.Exception.Message,
+                Message = context.Exception.InnerException==null?context.Exception.Message:context.Exception.InnerException.Message,
                 ControllerName = _controllerName,
                 ActionName = _actionName,
                 Time = DateTime.Now

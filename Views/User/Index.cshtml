@@ -2,33 +2,53 @@
 @using static BaiTap_phan3.Models.User
 @{
     ViewData["Title"] = "User-Index";
+    ViewData["log"] = "Log out";
     int index = 0;
+}
+
+@section nav {
+    <li class="nav-item">
+        <a id="staff-link" class="nav-link text-dark" asp-area="" asp-controller="Staff" asp-action="Index">Quản lý
+            nhân viên</a>
+    </li>
+    <li class="nav-item">
+        <a id="staff-link" class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Index">
+            User</a>
+    </li>
 }
 
 @{
     <div class="Tool-container">
-        <button class="add-btn btn"><input action="Create" type="Add"></button>
+        <a class="btn" id="staff-link" style="background-color: rgb(210, 210, 244); border-radius:3px" class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Create">
+            Create user</a>
     </div>
     <table class="table user-table">
         <thead>
-            <th>STT</th>
-            <th>Id</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Created date</th>
-            <th>Is active</th>
+            <tr>
+                <th>STT</th>
+                <th>Id</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Account Name</th>
+                <th>Password</th>
+                <th>Created date</th>
+                <th>Is active</th>
+            </tr>
         </thead>
         <tbody>
             @foreach (User user in ViewBag.Users)
             {
-                <td>
-                    <tr>@index++</tr>
-                    <tr>@user.Id</tr>
-                    <tr>@user.FirstName</tr>
-                    <tr>@user.LastName</tr>
-                    <tr>@user.CreateDate</tr>
-                    <tr>@user.IsActive</tr>
-                </td>
+                index++;
+                <tr>
+                    <td>@index</td>
+                    <td>@user.UserId</td>
+                    <td>@user.FirstName</td>
+                    <td>@user.LastName</td>
+                    <td>@user.AccountName</td>
+                    <td>@user.PassWord</td>
+                    <td>@user.CreatedDate</td>
+                    <td>@user.IsActive</td>
+                </tr>
             }
         </tbody>
     </table>

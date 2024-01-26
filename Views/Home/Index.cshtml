@@ -1,10 +1,33 @@
 @using BaiTap_phan3.Models;
+@using static BaiTap_phan3.Models.User;
+@using static List<BaiTap_phan3.Models.User>;
 @model BaiTap_phan3.Models.NhanVien;
+
+@section jsHome {
+   <script src="~/js/homejs.js" asp-append-version="true"></script>
+}
+
 
 @{
     ViewData["Title"] = "Home";
     ViewBag.message = "Home-index";
+    ViewBag.log = "Log out";
 }
 
 @{
+    <div class="row">
+        <div class="col-3" style="border: 2px solid black;">
+            <ul class="list-account">
+                @foreach(User user in ViewBag.AccountList){
+                    <li id="@user.UserId">@user.AccountName</li>
+                }
+            </ul>
+        </div>
+        <div class="col-7">
+            <div style="width: 500px; min-height:100vh; background-color: rgb(221, 190, 198);" class="container">
+
+            </div>
+        </div>
+    </div>
+
 }

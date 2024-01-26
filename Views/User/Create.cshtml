@@ -1,0 +1,37 @@
+@model BaiTap_phan3.Models.User;
+
+@{
+    ViewData["Title"] = "User create";
+}
+
+@{
+    <form style="width: 60%; background-color:rgb(169, 169, 211)" asp-action="Create" asp-controller="User" method="post" class="container">
+        <div class="form-group">
+            <label asp-for="FirstName"></label>
+            <input asp-for="FirstName" type="text"  class="form-control">
+            <span class="error-holder" asp-validation-for="FirstName"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="LastName"></label>
+            <input asp-for="LastName" type="text"  class="form-control">
+            <span class="error-holder"  asp-validation-for="LastName"></span>
+        </div>
+         <div class="form-group">
+            <label asp-for="AccountName"></label>
+            <input asp-for="AccountName" type="text"  class="form-control">
+            <span class="error-holder"  asp-validation-for="AccountName"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="PassWord"></label>
+            <input asp-for="PassWord" type="password"  class="form-control" value=""> 
+            <span class="error-holder"  asp-validation-for="PassWord"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="ConfirmPassWord"></label>
+            <input asp-for="ConfirmPassWord" type="password"  class="form-control">
+            <span class="error-holder"  asp-validation-for="ConfirmPassWord"></span>
+        </div>
+
+        <button class="btn btn-danger" style="color: white;" type="submit">ok</button>
+    </form>
+}

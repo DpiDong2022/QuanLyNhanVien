@@ -232,6 +232,22 @@ body {
   color: white;
 }
 
+.error-holder {
+  color: red;
+  font-size: smaller;
+}
+
+.list-account{
+  width: 100%;
+  background-color: rgb(227, 227, 187);
+  border: 1px solid black;
+}
+
+.list-account li{
+  width: 100%;
+  border: 1px solid rgb(226, 224, 224);
+}
+
 @keyframes righto {
   0%{transform: translateX(500px);}
   100%{transform: translateX(0px);}

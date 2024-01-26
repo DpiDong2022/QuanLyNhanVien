@@ -15,7 +15,7 @@ namespace BaiTap_phan3.Models
         public override string ToString()
         {
             return string.Format("\nRequest Id :{0} \nTime: {1}\nController name: {2}\nAction name: {3}\nMessage: {4}", 
-                                    RequestId, Time.ToString("hh:mm:ss"), ControllerName, ActionName, Message);
+            RequestId, Time.ToString("hh:mm:ss"), ControllerName, ActionName, Message);
         }
     }
     

@@ -42,7 +42,7 @@ namespace BaiTap_phan3.Controllers
             }
             catch (Exception ex)
             {
-                return RedirectToAction("Error", "Home", new ResponseError { Message = ex.Message });
+                return RedirectToAction("Error", "Home", new ResponseError { Message = ex.InnerException.Message });
             }
         }
 
