@@ -3,7 +3,7 @@
 
 
 
-<form data-id="" data-mode="" asp-action="Create" method="post" class="container bg-light px-0 form" id="staff-form" name="staff-form"
+<form data-mode="" asp-action="Create" data-stt="-1" method="post" class="container bg-light px-0 form" id="staff-form" name="staff-form"
     style="max-width: 500px;" autocomplete="off">
     <input style="display: none;" type="text" id="Id" asp-for="Id" name="Id" class="form-control">
     <div class="form-group mb-3">
@@ -62,7 +62,7 @@
         </div>
 
         <div class="col">
-            <button class=" btn btn-danger container-fluid" data-dismiss="modal">Hủy</button>
+            <button class=" btn btn-danger container-fluid" id="cancel-delete" data-dismiss="modal">Hủy</button>
         </div>
     </div>
 </form>

@@ -1,14 +1,7 @@
-using System;
 using System.Data;
 using Npgsql;
-using Microsoft.Extensions.Configuration;
 using Dapper;
 using System.Reflection;
-using Microsoft.VisualBasic;
-using OfficeOpenXml.Utils;
-using System.Diagnostics;
-using BaiTap_phan3.Models;
-using System.Net.Http.Headers;
 
 namespace BaiTap_phan3.DBContext
 {
@@ -134,7 +127,6 @@ namespace BaiTap_phan3.DBContext
                     {
                         sql += "\"" + tenThuocTinh + "\",";
                     }
-
                 }
                 sql = sql.Remove(sql.Length - 1, 1);
                 sql += ") values(";

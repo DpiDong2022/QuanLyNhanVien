@@ -8,18 +8,17 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using System.Drawing.Printing;
 using BaiTap_phan3.Filters;
-using Microsoft.AspNetCore.OutputCaching;
-using System.Text.RegularExpressions;
 
 
 namespace BaiTap_phan3.Controllers
 {
     // kiem tra trung V
     // phongban minvalue V
+
     // tim kiem co su uu tien V
     // select khong select all (*) V
     // them sua tra ve (id,truefalse) V
-    
+
     // thêm nút bỏ lọc và áp dụng lọc V
 
     // sửa trả về lỗi modelstate.isvalue V
@@ -48,7 +47,7 @@ namespace BaiTap_phan3.Controllers
         {
             try
             {
-                PageResult<NhanVien> pageResult = await _repositoryNhanVien.TimKiem("", -1, -1, new Pagination { PageNumber = 1, PageSize = 8 });
+                PageResult<NhanVien> pageResult = await _repositoryNhanVien.TimKiem("", -1, -1, new Pagination { PageNumber = 1, PageSize = 10 });
                 ViewBag.PageResult = pageResult;
                 ViewBag.PhongBans = await _repositoryPhongBan.GetAll();
                 ViewBag.ChucVus = await _repositoryChucVu.GetAll();
@@ -141,6 +140,7 @@ namespace BaiTap_phan3.Controllers
             }
             else
             {
+                //nhanVien.HoVaTen = Helper.FuncHelper.NameFormat(nhanVien.HoVaTen);
                 bool isSuccess = await _repositoryNhanVien.Update(nhanVien, nhanVien.Id);
                 return Json(new ResponseError() { Data = isSuccess });
             }
@@ -201,8 +201,8 @@ namespace BaiTap_phan3.Controllers
                 sheet.Cells[row + 3, 2].Value = nhanVienList[row].HoVaTen;
                 sheet.Cells[row + 3, 3].Value = nhanVienList[row].NgaySinh.ToString("dd-MM-yyyy");
                 sheet.Cells[row + 3, 4].Value = nhanVienList[row].DienThoai;
-                sheet.Cells[row + 3, 5].Value = nhanVienList[row].ChucVu;
-                sheet.Cells[row + 3, 6].Value = nhanVienList[row].PhongBan.TenPhongBan;
+                sheet.Cells[row + 3, 5].Value = nhanVienList[row].PhongBan.TenPhongBan;
+                sheet.Cells[row + 3, 6].Value = nhanVienList[row].ChucVu;
             }
 
             // destination path

@@ -3,7 +3,7 @@ let SelectedPageNumber = 1;
 $(document).ready(() => {
     // add - bắt sự kiện click thêm nhân viên
     $("#create-staff-btn").on("click", () => {
-        clear_the_form();
+        Clear_the_form();
         $("#staff-form").attr("data-mode", "Create");
         $(".staff-form-header").text("Thêm nhân viên")
         $("#phongban-selection-form").val($("#phongban-filter").val());
@@ -14,13 +14,13 @@ $(document).ready(() => {
     $(document).on("submit", "#staff-form", (event) => {
         event.preventDefault()
         if (Validate() == true) {
-            create_or_update();
+            Create_or_update();
         }
     });
 
     // edit - click - bắt sự kiện click sửa nhân viên
     $(document).on("click", ".edit-staff-btn", function () {
-        clear_the_form();
+        Clear_the_form();
         $("#staff-form").attr("data-mode", "Update");
         $(".staff-form-header").text("Sửa nhân viên");
         Pre_populate(this);
@@ -50,36 +50,44 @@ $(document).ready(() => {
     $("#search-button").click(function () {
         SelectedPageNumber = 1;
         Search();
+        window.scrollTo(0, document.body.scrollHeight);
     });
 
-    // thay đổi phòng ban
+    //
+    $("#search-input").on("emptied", ()=>{
+        SelectedPageNumber = 1;
+        Search();
+    });
+
+    // change - thay đổi phòng ban
     $("#phongban-filter").on("change", function () {
         SelectedPageNumber = 1;
         Search();
     })
 
-    // thay đổi chức vụ
+    // change - thay đổi chức vụ
     $("#chucvu-filter").on("change", function () {
         SelectedPageNumber = 1;
         Search();
     })
 
-    // chuyển trang
+    // change - chuyển trang
     $(document).on("click", "#staff-pagination button", function () {
         SelectedPageNumber = $(this).attr("id");
         Search();
     })
 
     // rend nút phân trang
-    rend_page_number();
+    Rend_page_number();
 
-    //  bắt sự kiện dismiss thông báo lỗi
+    // click - dismiss bắt sự kiện dismiss thông báo lỗi
     $(".warning-popup button").on("click", ()=> $(".warning-popup").hide());
 
-    // chọn/bỏ chọn lọc
+    // (chọn | bỏ chọn) lọc
     $(".IsFilted").on("click", Search);
 });
 
+// hiển thị lỗi 400 | 500
 function DisplayError(actionName, errorResponse) {
     $(".action-discription").text("Thực hiện " + actionName + " không thành công");
     if (errorResponse.Code == 500) {
@@ -100,7 +108,6 @@ function Search() {
     }
 
     let key = $("#search-input").val().trim().toLowerCase();
-    let _pageSize = 8;
     $.ajax({
         url: "Staff/Search",
         type: "get",
@@ -109,14 +116,12 @@ function Search() {
             keySearch: key,
             phongBanId: _phongBanId,
             chucVuId: _chucVuId,
-            PageSize: _pageSize,
             PageNumber: SelectedPageNumber
         },
         success: function (response) {
-            debugger
             if (response.Code == 200) {
                 $("#staff-container").html(response.Data);
-                rend_page_number();
+                Rend_page_number();
             } else {
                 DisplayError("Tìm Kiếm", response)
             }
@@ -131,11 +136,19 @@ function Delete(staff_id) {
     options.contentType = "application/json";
     $.ajax(options).done(function (response) {
         if (response.Code == 200) {
-            AddAnimation("#" + staff_id, "leftToRightOut 0.5s linear");
+            
+            // trừ 1 cho mỗi stt bên dưới element bị xóa
+            var alls = Array.from($("#staff-container tr#"+staff_id).nextAll("tr"));
+            alls.forEach((tr) => {
+                var sttElement = $(tr).find(".stt");
+                sttElement.text(+sttElement.text()-1);
+            })
 
+            AddAnimation("#" + staff_id, "leftToRightOut 0.5s linear");
             setTimeout(function () {
                 $("#" + staff_id).remove()
             }, 500);
+           
 
         } else {
             DisplayError("Xóa", response);
@@ -143,7 +156,8 @@ function Delete(staff_id) {
     });
 }
 
-function create_or_update() {  
+// thêm hoặc sửa nhân viên dựa trên data-mode trên form
+function Create_or_update() {  
     // get form
     let staff_form = document.getElementById("staff-form");
     // display loading
@@ -165,17 +179,18 @@ function create_or_update() {
         processData: false,
         contentType: false,
         success: function (response) {
-            debugger;
-            // close the loading after sending request successed!
+            // tắt loading khi gửi request thành công
             $(".loading").addClass("loader--hidden");
             $(".loading").removeClass("loader");
 
             if (response.Code == 200) {
+                $("#cancel-delete").trigger("click");
+                
                 if (mode == "Create") {
-                    Rend_New_Staff_Row(response.Data);
+                    Rend_new_staff_row(response.Data);
                 } else if (mode == "Update") {
                     if (response.Data) {
-                        Update_Existed_Staff_Row();
+                        Update_existed_staff_row();
                     }
                 }
             } else if (response.Code == 400) {
@@ -191,10 +206,15 @@ function create_or_update() {
     });
 }
 
-// export data into staff excel template
+// xuất file excel
 function ExportToExcel() {
-    let _phongBanId = $("#phongban-filter").val();
-    let _chucVuId = $("#chucvu-filter").val();
+    let _phongBanId = -1,
+        _chucVuId = -1;
+
+    if($(".IsFilted").prop("checked")){
+        _phongBanId = $("#phongban-filter").val();
+        _chucVuId = $("#chucvu-filter").val();
+    }
     let key = $("#search-input").val().toLowerCase();
     var options = {};
     options.url = "Staff/Report?";
@@ -215,33 +235,16 @@ function ExportToExcel() {
     });
 }
 
-function Pre_populate(root) {
-    let closest_row_tag = $(root).closest("tr");
-    let id = $(closest_row_tag).attr("id");
-    let hoVaTen = $(closest_row_tag).find(".hoVaTen").text();
-    let ngaySinh = DobFormatEN($(closest_row_tag).find(".ngaySinh").text());
-    let dienThoai = $(closest_row_tag).find(".dienThoai").text();
-    let phongBanId = $(closest_row_tag).find(".phongBan").data("id");
-    let chucVuId = $(closest_row_tag).find(".chucVu").data("id");
-
-    let staff_form = $("#staff-form");
-    staff_form.find("#Id").val(id)
-    staff_form.find("#HoVaTen").val(hoVaTen);
-    staff_form.find("#NgaySinh").val(ngaySinh);
-    staff_form.find("#DienThoai").val(dienThoai);
-    staff_form.find("#phongban-selection-form").val(phongBanId);
-    staff_form.find("#chucvu-selection-form").val(chucVuId);
-}
-
-function clear_the_form() {
+function Clear_the_form() {
     $("#staff-form input").val("");
     $(".error-holder").text("");
 }
 
-function GetStaffObj() {
+// lấy dữ liệu từ form nhân viên
+function Get_staff_obj() {
     let staff_model = {};
-
     let staff_form = $("#staff-form");
+    staff_model.Stt =  $(".partial-create").attr("data-stt");
     staff_model.Id = staff_form.find("#Id").val();
     staff_model.HoVaTen = staff_form.find("#HoVaTen").val();
     staff_model.NgaySinh = staff_form.find("#NgaySinh").val();
@@ -262,8 +265,8 @@ function GetStaffObj() {
     return staff_model;
 }
 
-// rend pagination
-function rend_page_number() {
+// rend nút phân trang
+function Rend_page_number() {
     totalPage = $("#hidden-totalpage").val();
     let pagination = document.getElementById("staff-pagination");
     pagination.innerHTML = "";
@@ -279,10 +282,31 @@ function rend_page_number() {
     }
 }
 
+function Pre_populate(root) {
+    let closest_row_tag = $(root).closest("tr");
+    let stt = $(closest_row_tag).find(".stt").text();
+    let id = $(closest_row_tag).attr("id");
+    let hoVaTen = $(closest_row_tag).find(".hoVaTen").text();
+    let ngaySinh = DobFormatEN($(closest_row_tag).find(".ngaySinh").text());
+    let dienThoai = $(closest_row_tag).find(".dienThoai").text();
+    let phongBanId = $(closest_row_tag).find(".phongBan").data("id");
+    let chucVuId = $(closest_row_tag).find(".chucVu").data("id");
+
+    let staff_form = $("#staff-form");
+    $(".partial-create").attr("data-stt", stt);
+    staff_form.find("#Id").val(id)
+    staff_form.find("#HoVaTen").val(hoVaTen);
+    staff_form.find("#NgaySinh").val(ngaySinh);
+    staff_form.find("#DienThoai").val(dienThoai);
+    staff_form.find("#phongban-selection-form").val(phongBanId);
+    staff_form.find("#chucvu-selection-form").val(chucVuId);
+}
+
 // rend new staff row
-function get_staff_row(staffObj) {
+function Get_staff_row_html(staffObj) {
 
     return `<tr id="${staffObj.Id}">
+                <td class="stt">${staffObj.Stt}</td>
                 <td class="id">${staffObj.Id}</td>
                 <td class="hoVaTen">${staffObj.HoVaTen}</td>
                 <td class="ngaySinh">${DobFormatVN(staffObj.NgaySinh)}</td>
@@ -299,40 +323,39 @@ function get_staff_row(staffObj) {
 }
 
 // rend the new tr staff row
-function Rend_New_Staff_Row(Id) {
-    let newNhanVienObj = GetStaffObj();
+function Rend_new_staff_row(Id) {
+    let newNhanVienObj = Get_staff_obj();
     newNhanVienObj.Id = Id;
-    $("#staff-container").prepend(get_staff_row(newNhanVienObj));
+    let highest_stt = +$("#staff-container tr:last .stt").text();
+    newNhanVienObj.Stt = highest_stt + 1;
+    $("#staff-container").append(Get_staff_row_html(newNhanVienObj));
 
     var selector = "#staff-container tr#" + Id;
     AddAnimation(selector, "leftToRightIn 0.15s linear");
-    AddCssTimeOut(selector, "border", "4px solid green", 700);
-
+    AddCssTimeOut(selector, "border", "4px solid green", 1000);
+    window.scrollTo(0, document.body.scrollHeight);
 }
 
-// update the changed tr staff row
-function Update_Existed_Staff_Row() {
-    let newNhanVienObj = GetStaffObj();
-    var newRow = get_staff_row(newNhanVienObj);
+// cập nhật hàng dữ liệu đã chỉnh sửa
+function Update_existed_staff_row() {
+    let newNhanVienObj = Get_staff_obj();
+    var newRow = Get_staff_row_html(newNhanVienObj);
     var selector = "#staff-container tr#" + newNhanVienObj.Id;
-    var updatedRow = $(selector);
-    updatedRow.replaceWith(newRow);
+    $(selector).replaceWith(newRow);
 
     AddAnimation(selector, "leftToRightIn 0.15s linear");
     AddCssTimeOut(selector, "border", "4px solid green", 700);
 }
 
 function AddAnimation(selector, value) {
-    $(".close").click();
     $(selector).css("animation", value);
 }
 
-function AddCssTimeOut(selector, AttrName, value, miniSecond) {
-    if (timeOutMinisecond) {
-        setTimeout(() => {
-            $(selector).css(AttrName, value);
-        }, miniSecond);
-    }
+function AddCssTimeOut(selector, attrName, value, miniSecond) {
+    $(selector).css(attrName, value);
+    setTimeout(() => {
+        $(selector).css(attrName, "");
+    }, miniSecond);
 }
 
 function Validate() {

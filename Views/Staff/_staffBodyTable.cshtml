@@ -1,9 +1,15 @@
 @using BaiTap_phan3.Models;
 @model BaiTap_phan3.Models.NhanVien;
 
+@{
+    int index = ViewBag.PageResult.Pagination.OffsetAt;
+}
+
 @foreach (NhanVien nv in ViewBag.PageResult.Data)
 {   
+    index++;
     <tr id="@nv.Id">
+        <td class="stt">@index</td>
         <td class="id">@nv.Id</td>
         <td class="hoVaTen">@nv.HoVaTen</td>
         <td class="ngaySinh">@nv.NgaySinh.ToString("dd-MM-yyyy")</td>

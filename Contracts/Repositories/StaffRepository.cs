@@ -19,10 +19,12 @@ namespace BaiTap_phan3.Contracts.Repositories
     public class StaffRepository : IStaffRepository<NhanVien>
     {
         private readonly DapperContext<NhanVien> _dbContext;
+        private readonly IConfiguration _configuration;
 
-        public StaffRepository(DapperContext<NhanVien> dapperContext)
+        public StaffRepository(DapperContext<NhanVien> dapperContext, IConfiguration configuration)
         {
             _dbContext = dapperContext;
+            _configuration = configuration;
         }
 
         public async Task<bool> Delete(object id)
@@ -82,32 +84,43 @@ namespace BaiTap_phan3.Contracts.Repositories
                 conditions.Add($"n.\"ChucVuId\" = {chucVuId}");
             }
 
-            if(!string.IsNullOrEmpty(searchKey)){
+            if (!string.IsNullOrEmpty(searchKey))
+            {
                 string tempSearchKey = searchKey.Trim();
+
                 tempSearchKey = Regex.Replace(searchKey, @"[^\p{L}0-9 ]", "").ToLower();
                 tempSearchKey = Regex.Replace(tempSearchKey, @"\s+", " ");
-                tempSearchKey = tempSearchKey.Replace(" "," | ");
+                tempSearchKey = tempSearchKey.Replace(" ", " | ");
+
                 string searchTerm = $"unaccent('{tempSearchKey}')::tsquery";
                 conditions.Add($"n.\"Document\" @@ {searchTerm} ORDER BY ts_rank(n.\"Document\", {searchTerm}) desc, n.\"Id\"");
             }
 
-            if(conditions.Count()>0){
+            if (conditions.Count() > 0)
+            {
                 sqlBuilder.Append(" WHERE ");
                 sqlBuilder.Append(string.Join(" AND ", conditions));
             }
 
-            if(string.IsNullOrEmpty(searchKey)){
-                sqlBuilder.Append("ORDER BY n.\"Id\"");
-            }
-
-            // lấy ra bản ghi phân trang
-            int skipAmount = (pagination.PageNumber - 1) * pagination.PageSize;
-
             if (IsPaginated)
             {
+                // lấy ra bản ghi phân trang
+                pagination.PageSize = int.Parse(_configuration["Frontend:PageSize"]);
+                int skipAmount = (pagination.PageNumber - 1) * pagination.PageSize;
+                pagination.OffsetAt = skipAmount;
+
+                if (string.IsNullOrEmpty(searchKey))
+                {
+                    sqlBuilder.Append(" ORDER BY n.\"Id\"");
+                }
                 sqlBuilder.Append(" LIMIT(" + pagination.PageSize + ")" +
                        " OFFSET " + skipAmount);
             }
+            else
+            {
+                sqlBuilder.Append(" ORDER BY n.\"PhongBanId\", n.\"ChucVuId\"");
+            }
+
 
             using (var conenction = _dbContext.CreateConnection())
             {
@@ -133,7 +146,7 @@ namespace BaiTap_phan3.Contracts.Repositories
 
         public async Task<int> Count(int phongBanId = -1, int chucVuId = -1, string searchKey = "")
         {
-           List<string> conditions = new List<string>();
+            List<string> conditions = new List<string>();
             StringBuilder sqlBuilder = new StringBuilder("SELECT count(*) from (select 1 from \"NhanVien\" as n");
 
             if (phongBanId >= 1)
@@ -145,16 +158,18 @@ namespace BaiTap_phan3.Contracts.Repositories
                 conditions.Add($"n.\"ChucVuId\"={chucVuId}");
             }
 
-            if(!string.IsNullOrEmpty(searchKey)){
+            if (!string.IsNullOrEmpty(searchKey))
+            {
                 searchKey = searchKey.Trim();
                 searchKey = Regex.Replace(searchKey, @"[^\p{L}0-9 ]", "").ToLower();
                 searchKey = Regex.Replace(searchKey, @"\s+", " ");
-                searchKey = searchKey.Replace(" "," | ");
+                searchKey = searchKey.Replace(" ", " | ");
                 string searchTerm = $"unaccent('{searchKey}')::tsquery";
                 conditions.Add($"n.\"Document\" @@ {searchTerm} ORDER BY ts_rank(n.\"Document\", {searchTerm}) desc");
             }
 
-            if(conditions.Count()>0){
+            if (conditions.Count() > 0)
+            {
                 sqlBuilder.Append(" WHERE ");
                 sqlBuilder.Append(string.Join(" AND ", conditions));
             }
@@ -171,7 +186,8 @@ namespace BaiTap_phan3.Contracts.Repositories
 
         public async Task<bool> KiemTraTrung(NhanVien nhanVien)
         {
-            string sql = $"select exists (select 1 from \"NhanVien\" where \"HoVaTen\"='{nhanVien.HoVaTen}' and \"NgaySinh\" = '{nhanVien.NgaySinh.ToString("yyyy-MM-dd")}' )";
+            string hoVaTen = nhanVien.HoVaTen.ToLower();
+            string sql = $"select exists (select 1 from \"NhanVien\" where \"HoVaTen\" ILIKE '{hoVaTen}' and \"NgaySinh\" = '{nhanVien.NgaySinh.ToString("yyyy-MM-dd")}' )";
             if (nhanVien.Id >= 1)
             {
                 sql = sql.Insert(sql.Length - 2, $"and \"Id\"!={nhanVien.Id}");

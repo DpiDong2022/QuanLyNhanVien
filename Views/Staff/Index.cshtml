@@ -13,6 +13,10 @@
             font-size: smaller;
             position: absolute;
         }
+
+        #DobError{
+            position: static;
+        }
     </style>
 
     //loading...
@@ -67,6 +71,7 @@
         <thead style="background-color: rgb(74, 74, 206); color: white">
             <tr>
                 <th>STT</th>
+                <th>ID</th>
                 <th>Họ và tên</th>
                 <th>Ngày sinh</th>
                 <th>SDT</th>
@@ -84,14 +89,14 @@
     <div id="staff-pagination" class="list-group list-group-horizontal justify-content-center"></div>
 
     <!--modal them/sua nhan vien-->
-    <div class="modal fade" id="modal-edit-staff" tabindex="-1" role="dialog">
+    <div class="modal fade" id="modal-edit-staff" tabindex="-1">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header pb-0">
                     <h4 class="modal-header staff-form-header">Thêm/Sửa thông tin nhân viên</h4>
                     <button class="close" data-dismiss="modal">&times;</button>
                 </div>
-                <div class="modal-body partial-create container pb-0">
+                <div class="modal-body partial-create container pb-0" data-stt=-1>
                     @Html.Partial("_createStaffModal")
                 </div>
             </div>
