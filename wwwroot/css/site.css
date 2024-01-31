@@ -31,7 +31,7 @@ body {
 }
 
 .tool button,
-.tool select {
+.tool select{
   background-color: rgb(74, 74, 206);
   color: white;
   height: 40px;
@@ -42,6 +42,11 @@ body {
   border: 1px solid rgb(74, 74, 206);
   margin-right: 10px;
   text-align: center;
+}
+
+.tool label{
+  margin: 0;
+
 }
 
 .tool select option {
@@ -162,6 +167,7 @@ body {
 
 /* warning */
 .warning-container{
+  z-index: 100000;
   position: fixed;
   top: 50%;
   left: 50%;

@@ -11,6 +11,7 @@
         .error-holder {
             color: red;
             font-size: smaller;
+            position: absolute;
         }
     </style>
 
@@ -32,13 +33,33 @@
         <!--Nút tải xuống Excel-->
         <button class="" onclick="ExportToExcel()">Xuất thành file excel <i class="fa fa-download"></i></button>
         <!--Drop down lọc phòng ban-->
-        <select asp-for="PhongBanId" id="phongban-filter" class="">
+        <div style="position: relative; display:inline-block; width: 86px;">
+            <label style="position: absolute; bottom:-12px" for="phongban">Phòng ban: </label>
+        </div>
+        <select name="phongban" asp-for="PhongBanId" id="phongban-filter" class="">
             <option name="PhongBanId" selected value=-1 style="font-style: italic;">--Tất cả--</option>
             @foreach (PhongBan phongBan in ViewBag.PhongBans)
             {
                 <option name="PhongBanId" data-id="@phongBan.Id" value="@phongBan.Id">@phongBan.TenPhongBan </option>
             }
         </select>
+        <div style="position: relative; display:inline-block; width: 66px;">
+            <label style="position: absolute; bottom:-12px" for="chucvu">Chức vụ: </label>
+        </div>
+        <!--Drop down lọc Chức vụ-->
+        <select name="chucvu" asp-for="ChucVuId" id="chucvu-filter" class="">
+            <option selected value=-1 style="font-style: italic;">--Tất cả--</option>
+            @foreach (ChucVu chucVu in ViewBag.ChucVus)
+            {
+                <option value="@chucVu.Id">@chucVu.TenChucVu </option>
+            }
+        </select>
+
+        <div style="position: relative; display:inline-block; width: 150px">
+            <label style="position: absolute; bottom:-12px">Áp dụng lọc: 
+                <input style="width: 25px; height: 25px; margin-left:3px; position: absolute; bottom:3px; right:-32px" class="IsFilted" type="checkbox" checked>
+            </label>
+        </div>
     </div>
 
     <!--bảng thông tin nhân viên-->
@@ -49,13 +70,13 @@
                 <th>Họ và tên</th>
                 <th>Ngày sinh</th>
                 <th>SDT</th>
-                <th>Chức vụ</th>
                 <th>Phòng ban</th>
+                <th>Chức vụ</th>
                 <th>Thao tác</th>
             </tr>
         </thead>
         <tbody id="staff-container">
-            @Html.Partial("_staffBodyTable", Model)
+            @Html.Partial("_staffBodyTable")
         </tbody>
     </table>
 
@@ -68,7 +89,6 @@
             <div class="modal-content">
                 <div class="modal-header pb-0">
                     <h4 class="modal-header staff-form-header">Thêm/Sửa thông tin nhân viên</h4>
-                    <p style="color: green; padding:14px; height:100%; font-weight:bold" class="modal-message"></p>
                     <button class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body partial-create container pb-0">
@@ -100,7 +120,6 @@
         </div>
     </div>
 
-    @* message *@
     <div class="warning-container">
         <div class="warning-popup">
             <div class="icon-container">

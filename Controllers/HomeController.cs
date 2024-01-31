@@ -6,12 +6,13 @@ using Microsoft.AspNetCore.WebUtilities;
 
 namespace BaiTap_phan3.Controllers;
 
-  [MyActionFilter]
+[MyActionFilter]
 public class HomeController : Controller
 {
     private IHostEnvironment _hostEnvironment;
     private readonly ILogger<HomeController> _logger;
-    public HomeController(IWebHostEnvironment hostingEnvironment, ILogger<HomeController> logger){
+    public HomeController(IWebHostEnvironment hostingEnvironment, ILogger<HomeController> logger)
+    {
         _hostEnvironment = hostingEnvironment;
         _logger = logger;
     }

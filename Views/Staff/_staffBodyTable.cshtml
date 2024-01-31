@@ -1,18 +1,15 @@
 @using BaiTap_phan3.Models;
+@model BaiTap_phan3.Models.NhanVien;
 
-@{
-    int index = @ViewBag.PageResult.Pagination.OffsetAt;
-}
 @foreach (NhanVien nv in ViewBag.PageResult.Data)
-{
-    index++;
+{   
     <tr id="@nv.Id">
-        <td class="id">@index</td>
+        <td class="id">@nv.Id</td>
         <td class="hoVaTen">@nv.HoVaTen</td>
         <td class="ngaySinh">@nv.NgaySinh.ToString("dd-MM-yyyy")</td>
         <td class="dienThoai">@nv.DienThoai</td>
-        <td class="chucVu">@nv.ChucVu</td>
         <td class="phongBan" data-id="@nv.PhongBan.Id">@nv.PhongBan.TenPhongBan</td> 
+        <td class="chucVu"data-id="@nv.ChucVu.Id">@nv.ChucVu.TenChucVu</td>
         <td class="btn-area">
             <button data-id=@nv.Id class="btn bg-warning m-1 edit-staff-btn" data-toggle="modal" data-target="#modal-edit-staff"
                 >Sửa</button>

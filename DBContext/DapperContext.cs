@@ -8,6 +8,7 @@ using Microsoft.VisualBasic;
 using OfficeOpenXml.Utils;
 using System.Diagnostics;
 using BaiTap_phan3.Models;
+using System.Net.Http.Headers;
 
 namespace BaiTap_phan3.DBContext
 {
@@ -88,7 +89,7 @@ namespace BaiTap_phan3.DBContext
             }
         }
 
-        public async Task<T> Update(object id, T obj)
+        public async Task<bool> Update(object id, T obj)
         {
                 string sql = "update \"" + _tableName + "\" set ";
                 foreach (string thuocTinh in _thuocTinhs)
@@ -103,7 +104,10 @@ namespace BaiTap_phan3.DBContext
                 using (var connection = CreateConnection())
                 {
                     int rowEffected = connection.Execute(sql, obj);
-                    return await GetById(id);
+                    if(rowEffected > 0){
+                        return true;
+                    }
+                    return false;
                 }
         }
 
@@ -121,7 +125,7 @@ namespace BaiTap_phan3.DBContext
                 }
         }
 
-        public async Task<T> Insert(T obj)
+        public async Task<int> Insert(T obj)
         {
                 string sql = "insert into \"" + _tableName + "\"(";
                 foreach (string tenThuocTinh in _thuocTinhs)
@@ -150,7 +154,7 @@ namespace BaiTap_phan3.DBContext
                 using (var connection = CreateConnection())
                 {
                     int id = connection.QuerySingle<int>(sql, obj);
-                    return await GetById(id);
+                    return id;
                 }
         }
 

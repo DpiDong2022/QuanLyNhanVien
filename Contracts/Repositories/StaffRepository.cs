@@ -2,14 +2,18 @@
 using BaiTap_phan3.Models;
 using BaiTap_phan3.DBContext;
 using Dapper;
+using System.Text;
+using System.Security.Cryptography.Pkcs;
+using System.Text.RegularExpressions;
 
 namespace BaiTap_phan3.Contracts.Repositories
 {
 
     public interface IStaffRepository<T> : IGenericRepository<T>
     {
-        Task<PageResult<NhanVien>> TimKiem(string searhKey, int phongBanId, Pagination pagination, bool IsPaginated=true);
-        Task<int> Count(int phongBanId = -1, string tuKhoaTimKiem = "");
+        Task<PageResult<NhanVien>> TimKiem(string searhKey, int phongBanId, int chucVu, Pagination pagination, bool IsPaginated = true);
+        Task<int> Count(int phongBanId = -1, int chucVuId = -1, string searchKey = "");
+        Task<bool> KiemTraTrung(NhanVien nhanVien);
     }
 
     public class StaffRepository : IStaffRepository<NhanVien>
@@ -48,78 +52,74 @@ namespace BaiTap_phan3.Contracts.Repositories
             return await _dbContext.GetById(id);
         }
 
-        public async Task<NhanVien> Insert(NhanVien obj)
+        public async Task<int> Insert(NhanVien obj)
         {
             return await _dbContext.Insert(obj);
         }
 
-        public async Task<NhanVien> Update(NhanVien obj, object id)
+        public async Task<bool> Update(NhanVien obj, object id)
         {
             return await _dbContext.Update(id, obj);
         }
 
 
-        public async Task<PageResult<NhanVien>> TimKiem(string searchKey, int phongBanId, Pagination pagination, bool IsPaginated = true)
+        public async Task<PageResult<NhanVien>> TimKiem(string searchKey, int phongBanId, int chucVuId, Pagination pagination, bool IsPaginated = true)
         {
-            string sql = "SELECT n.*, p.* FROM \"NhanVien\" as n " +
-            "JOIN \"PhongBan\" as p ON n.\"PhongBanId\" = p.\"Id\" ";
+            List<string> conditions = new List<string>();
+            StringBuilder sqlBuilder = new StringBuilder("SELECT n.\"Id\", n.\"HoVaTen\", n.\"NgaySinh\", n.\"DienThoai\", " +
+                                                        "p.\"Id\", p.\"TenPhongBan\", " +
+                                                        "c.\"Id\", c.\"TenChucVu\" " +
+                                                        "FROM \"NhanVien\" as n " +
+                                                        "JOIN \"ChucVu\" as c on c.\"Id\" = n.\"ChucVuId\" " +
+                                                        "JOIN \"PhongBan\" as p on p.\"Id\" = n.\"PhongBanId\"");
 
-            // loc phong ban
             if (phongBanId >= 1)
             {
-                sql += "WHERE n.\"PhongBanId\" = " + phongBanId;
+                conditions.Add($"n.\"PhongBanId\" = {phongBanId}");
+            }
+            if (chucVuId >= 1)
+            {
+                conditions.Add($"n.\"ChucVuId\" = {chucVuId}");
             }
 
-            //lọc bằng từ khóa
-            if (!string.IsNullOrEmpty(searchKey))
-            {
+            if(!string.IsNullOrEmpty(searchKey)){
+                string tempSearchKey = searchKey.Trim();
+                tempSearchKey = Regex.Replace(searchKey, @"[^\p{L}0-9 ]", "").ToLower();
+                tempSearchKey = Regex.Replace(tempSearchKey, @"\s+", " ");
+                tempSearchKey = tempSearchKey.Replace(" "," | ");
+                string searchTerm = $"unaccent('{tempSearchKey}')::tsquery";
+                conditions.Add($"n.\"Document\" @@ {searchTerm} ORDER BY ts_rank(n.\"Document\", {searchTerm}) desc, n.\"Id\"");
+            }
 
-                string[] keys = searchKey.Split(" ");
-                keys = keys.Where(c => c != "").ToArray();
+            if(conditions.Count()>0){
+                sqlBuilder.Append(" WHERE ");
+                sqlBuilder.Append(string.Join(" AND ", conditions));
+            }
 
-                if (phongBanId >= 1)
-                {
-                    sql += " AND (";
-                }
-                else
-                {
-                    sql += "WHERE ";
-                }
-
-                foreach (var key in keys)
-                {
-                    sql += $" n.\"HoVaTen\" ILIKE '%{key}%' OR";
-                }
-
-                sql = sql.Substring(0, sql.Length - 3);
-
-                if (phongBanId >= 1)
-                {
-                    sql += ")";
-                }
+            if(string.IsNullOrEmpty(searchKey)){
+                sqlBuilder.Append("ORDER BY n.\"Id\"");
             }
 
             // lấy ra bản ghi phân trang
             int skipAmount = (pagination.PageNumber - 1) * pagination.PageSize;
 
-            sql += " ORDER BY n.\"Id\" ";
             if (IsPaginated)
             {
-                sql += " LIMIT(" + pagination.PageSize + ")" +
-                       " OFFSET " + skipAmount;
+                sqlBuilder.Append(" LIMIT(" + pagination.PageSize + ")" +
+                       " OFFSET " + skipAmount);
             }
-            pagination.OffsetAt = skipAmount;
 
             using (var conenction = _dbContext.CreateConnection())
             {
-                IEnumerable<NhanVien> nhanViens = await conenction.QueryAsync<NhanVien, PhongBan, NhanVien>(sql, (nhanVien, phongBan) =>
+                IEnumerable<NhanVien> nhanViens = await conenction.QueryAsync<NhanVien, PhongBan, ChucVu, NhanVien>(sqlBuilder.ToString(), (nhanVien, phongBan, chucVu) =>
                 {
                     nhanVien.PhongBan = phongBan;
+                    nhanVien.ChucVu = chucVu;
                     return nhanVien;
-                }, splitOn: "PhongBanId");
+                }, splitOn: "Id");
 
                 int totalPage;
-                int totalRecord = await Count(phongBanId, searchKey);
+                int totalRecord = await Count(phongBanId, chucVuId, searchKey);
                 if (totalRecord < pagination.PageSize)
                 {
                     totalPage = 1;
@@ -131,52 +131,57 @@ namespace BaiTap_phan3.Contracts.Repositories
             }
         }
 
-        public async Task<int> Count(int phongBanId = -1, string tuKhoaTimKiem = "")
+        public async Task<int> Count(int phongBanId = -1, int chucVuId = -1, string searchKey = "")
         {
-            string sql = "SELECT count(*) FROM \"NhanVien\" as n " +
-            "JOIN \"PhongBan\" as p ON n.\"PhongBanId\" = p.\"Id\" ";
+           List<string> conditions = new List<string>();
+            StringBuilder sqlBuilder = new StringBuilder("SELECT count(*) from (select 1 from \"NhanVien\" as n");
 
-            // loc phong ban
             if (phongBanId >= 1)
             {
-                sql += "WHERE n.\"PhongBanId\" = " + phongBanId;
+                conditions.Add($"n.\"PhongBanId\"={phongBanId}");
+            }
+            if (chucVuId >= 1)
+            {
+                conditions.Add($"n.\"ChucVuId\"={chucVuId}");
             }
 
+            if(!string.IsNullOrEmpty(searchKey)){
+                searchKey = searchKey.Trim();
+                searchKey = Regex.Replace(searchKey, @"[^\p{L}0-9 ]", "").ToLower();
+                searchKey = Regex.Replace(searchKey, @"\s+", " ");
+                searchKey = searchKey.Replace(" "," | ");
+                string searchTerm = $"unaccent('{searchKey}')::tsquery";
+                conditions.Add($"n.\"Document\" @@ {searchTerm} ORDER BY ts_rank(n.\"Document\", {searchTerm}) desc");
+            }
 
-            //lọc bằng từ khóa
-            if (!string.IsNullOrEmpty(tuKhoaTimKiem))
+            if(conditions.Count()>0){
+                sqlBuilder.Append(" WHERE ");
+                sqlBuilder.Append(string.Join(" AND ", conditions));
+            }
+
+            sqlBuilder.Append(") as temp");
+
+            using (var conenction = _dbContext.CreateConnection())
             {
-                string[] keys = tuKhoaTimKiem.Split(" ");
-                keys = keys.Where(c => c != "").ToArray();
+                int count = await conenction.QuerySingleAsync<int>(sqlBuilder.ToString());
 
-                if (phongBanId >= 1)
-                {
-                    sql += " AND (";
-                }
-                else
-                {
-                    sql += " where ";
-                }
+                return count;
+            }
+        }
 
-
-                foreach (var key in keys)
-                {
-                    sql += $" n.\"HoVaTen\" LIKE '%{key}%' OR";
-                }
-
-                sql = sql.Substring(0, sql.Length - 3);
-
-                if (phongBanId >= 1)
-                {
-                    sql += ")";
-                }
+        public async Task<bool> KiemTraTrung(NhanVien nhanVien)
+        {
+            string sql = $"select exists (select 1 from \"NhanVien\" where \"HoVaTen\"='{nhanVien.HoVaTen}' and \"NgaySinh\" = '{nhanVien.NgaySinh.ToString("yyyy-MM-dd")}' )";
+            if (nhanVien.Id >= 1)
+            {
+                sql = sql.Insert(sql.Length - 2, $"and \"Id\"!={nhanVien.Id}");
             }
 
             using (var conenction = _dbContext.CreateConnection())
             {
-                int count = await conenction.QuerySingleAsync<int>(sql);
+                bool isExisted = await conenction.QuerySingleAsync<bool>(sql);
 
-                return count;
+                return isExisted;
             }
         }
     }

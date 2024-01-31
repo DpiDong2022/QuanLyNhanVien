@@ -14,20 +14,33 @@ using System.Text.RegularExpressions;
 
 namespace BaiTap_phan3.Controllers
 {
+    // kiem tra trung V
+    // phongban minvalue V
+    // tim kiem co su uu tien V
+    // select khong select all (*) V
+    // them sua tra ve (id,truefalse) V
+    
+    // thêm nút bỏ lọc và áp dụng lọc V
 
-    // sửa trả về lỗi modelstate.isvalue
-    // tìm kiếm phân trang phía db, sử dụng index và fulltext
+    // sửa trả về lỗi modelstate.isvalue V
+    // tìm kiếm phân trang phía db, sử dụng index và fulltext V
     [MyActionFilter]
     public class StaffController : Controller
     {
         private readonly IStaffRepository<NhanVien> _repositoryNhanVien;
         private readonly IGenericRepository<PhongBan> _repositoryPhongBan;
+        private readonly IGenericRepository<ChucVu> _repositoryChucVu;
         private readonly IHostEnvironment _hostEnvironment;
-        public StaffController(IHostEnvironment hostingEnvironment, IStaffRepository<NhanVien> repositoryNhanVien, IGenericRepository<PhongBan> repositoryPhongBan)
+        private static List<PhongBan> _phongBanList;
+        private readonly List<ChucVu> _chucVuList;
+        public StaffController(IHostEnvironment hostingEnvironment, IStaffRepository<NhanVien> repositoryNhanVien, IGenericRepository<PhongBan> repositoryPhongBan, IGenericRepository<ChucVu> repositoryChucVu)
         {
             _repositoryNhanVien = repositoryNhanVien;
             _repositoryPhongBan = repositoryPhongBan;
+            _repositoryChucVu = repositoryChucVu;
             _hostEnvironment = hostingEnvironment;
+            _phongBanList = repositoryPhongBan.GetAll().Result;
+            _chucVuList = repositoryChucVu.GetAll().Result;
         }
 
         [HttpGet]
@@ -35,9 +48,10 @@ namespace BaiTap_phan3.Controllers
         {
             try
             {
-                PageResult<NhanVien> pageResult = await _repositoryNhanVien.TimKiem("", -1, new Pagination { PageNumber = 1, PageSize = 8 });
+                PageResult<NhanVien> pageResult = await _repositoryNhanVien.TimKiem("", -1, -1, new Pagination { PageNumber = 1, PageSize = 8 });
                 ViewBag.PageResult = pageResult;
                 ViewBag.PhongBans = await _repositoryPhongBan.GetAll();
+                ViewBag.ChucVus = await _repositoryChucVu.GetAll();
                 return View();
             }
             catch (Exception ex)
@@ -49,13 +63,14 @@ namespace BaiTap_phan3.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(NhanVien nhanVien)
         {
-            ViewBag.PhongBans = await _repositoryPhongBan.GetAll();
             if (nhanVien.PhongBanId == 0)
             {
                 ModelState.AddModelError("PhongBanId", "PHòng ban là bắt buộc");
             }
             if (!ModelState.IsValid)
             {
+                ViewBag.PhongBans = _phongBanList;
+                ViewBag.ChucVus = _chucVuList;
                 return Json(new ResponseError()
                 {
                     Status = "Bad request",
@@ -64,7 +79,7 @@ namespace BaiTap_phan3.Controllers
                 });
             }
 
-            if (KiemTraNhanVienChung(nhanVien))
+            if (await _repositoryNhanVien.KiemTraTrung(nhanVien))
             {
                 ModelState.AddModelError("HoVaTen", "Nhân viên đã tồn tại");
                 ModelState.AddModelError("NgaySinh", "Ngày sinh bị trùng");
@@ -72,6 +87,8 @@ namespace BaiTap_phan3.Controllers
 
             if (!ModelState.IsValid)
             {
+                ViewBag.PhongBans = _phongBanList;
+                ViewBag.ChucVus = _chucVuList;
                 return Json(new ResponseError()
                 {
                     Status = "Bad request",
@@ -82,39 +99,18 @@ namespace BaiTap_phan3.Controllers
             }
             else
             {
-                NhanVien nhanVienResult = await _repositoryNhanVien.Insert(nhanVien);
-                nhanVienResult.PhongBan = await _repositoryPhongBan.GetById(nhanVienResult.PhongBanId);
-                return Json(new ResponseError() { Data = nhanVienResult });
-            }
-        }
-
-        private bool KiemTraNhanVienChung(NhanVien nhanVien)
-        {
-            List<NhanVien> nhanViens = _repositoryNhanVien.GetAll().Result;
-            nhanVien.HoVaTen = nhanVien.HoVaTen.ToLower();
-            int id = nhanVien.Id ?? 0;
-            if (id == 0)
-            {
-                bool result = nhanViens.
-                           Any(nv => nv.HoVaTen.ToLower() == nhanVien.HoVaTen &&
-                               nv.NgaySinh == nhanVien.NgaySinh);
-                return result;
-            }
-            else
-            {
-                return nhanViens.
-                           Any(nv => nv.HoVaTen.ToLower() == nhanVien.HoVaTen &&
-                               nv.NgaySinh == nhanVien.NgaySinh &&
-                               nv.Id != id);
+                int nhanVienMoi_id = await _repositoryNhanVien.Insert(nhanVien);
+                return Json(new ResponseError() { Data = nhanVienMoi_id });
             }
         }
 
         [HttpPost]
         public async Task<IActionResult> Update(NhanVien nhanVien)
         {
-            ViewBag.PhongBans = await _repositoryPhongBan.GetAll();
             if (!ModelState.IsValid)
             {
+                ViewBag.PhongBans = _phongBanList;
+                ViewBag.ChucVus = _chucVuList;
                 return Json(new ResponseError()
                 {
                     Status = "Bad request",
@@ -124,7 +120,7 @@ namespace BaiTap_phan3.Controllers
                 });
             }
 
-            if (KiemTraNhanVienChung(nhanVien))
+            if (await _repositoryNhanVien.KiemTraTrung(nhanVien))
             {
                 ModelState.AddModelError("HoVaTen", "Nhân viên đã tồn tại");
                 ModelState.AddModelError("NgaySinh", "Ngày sinh bị trùng");
@@ -132,6 +128,8 @@ namespace BaiTap_phan3.Controllers
 
             if (!ModelState.IsValid)
             {
+                ViewBag.PhongBans = _phongBanList;
+                ViewBag.ChucVus = _chucVuList;
                 return Json(new ResponseError()
                 {
                     Status = "Bad request",
@@ -143,9 +141,8 @@ namespace BaiTap_phan3.Controllers
             }
             else
             {
-                NhanVien nhanVienResult = await _repositoryNhanVien.Update(nhanVien, nhanVien.Id);
-                nhanVienResult.PhongBan = await _repositoryPhongBan.GetById(nhanVienResult.PhongBanId);
-                return Json(new ResponseError() { Data = nhanVienResult });
+                bool isSuccess = await _repositoryNhanVien.Update(nhanVien, nhanVien.Id);
+                return Json(new ResponseError() { Data = isSuccess });
             }
         }
 
@@ -157,12 +154,12 @@ namespace BaiTap_phan3.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Report(string keySearch, int phongBanId)
+        public async Task<IActionResult> Report(string keySearch, int phongBanId, int chucVu)
         {
 
-            IEnumerable<NhanVien>? nhanViens = _repositoryNhanVien.TimKiem(keySearch, phongBanId, new Pagination() ,false).Result.Data;
+            IEnumerable<NhanVien>? nhanViens = _repositoryNhanVien.TimKiem(keySearch, phongBanId, chucVu, new Pagination(), false).Result.Data;
             var filePath = ToExcel(nhanViens);
-            return Json(new ResponseBase{ Data = filePath});
+            return Json(new ResponseBase { Data = filePath });
         }
 
         [HttpGet]
@@ -174,11 +171,11 @@ namespace BaiTap_phan3.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Search(string keySearch, int phongBanId, Pagination pagination)
+        public async Task<IActionResult> Search(string keySearch, int phongBanId, int chucVuId, Pagination pagination)
         {
-            PageResult<NhanVien> pageResult = await _repositoryNhanVien.TimKiem(keySearch, phongBanId, pagination);
+            PageResult<NhanVien> pageResult = await _repositoryNhanVien.TimKiem(keySearch, phongBanId, chucVuId, pagination);
             ViewBag.PageResult = pageResult;
-            return Json(new ResponseBase{ Data = RenderRazorViewToString(this, "_staffBodyTable") });
+            return Json(new ResponseBase { Data = RenderRazorViewToString(this, "_staffBodyTable") });
         }
 
         public string ToExcel(IEnumerable<NhanVien> nhanViens)

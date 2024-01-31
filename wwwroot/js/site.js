@@ -1,97 +1,105 @@
 let SelectedPageNumber = 1;
 
 $(document).ready(() => {
-    // open staff form to insert
-    $(document).on("click", "#create-staff-btn", () => {
-        clean_the_form();
+    // add - bắt sự kiện click thêm nhân viên
+    $("#create-staff-btn").on("click", () => {
+        clear_the_form();
         $("#staff-form").attr("data-mode", "Create");
         $(".staff-form-header").text("Thêm nhân viên")
         $("#phongban-selection-form").val($("#phongban-filter").val());
-    })
+        $("#chucvu-selection-form").val($("#chucvu-filter").val());
+    });
 
-    // listener validate before send request
+    // submit - bắt sự kiện submit form nhân viên
     $(document).on("submit", "#staff-form", (event) => {
         event.preventDefault()
-        // hide the success message
-        $(".modal-message").text("");
         if (Validate() == true) {
             create_or_update();
         }
     });
 
-    // prepare the form to edit when the edit btn's clicked
+    // edit - click - bắt sự kiện click sửa nhân viên
     $(document).on("click", ".edit-staff-btn", function () {
-        clean_the_form();
+        clear_the_form();
         $("#staff-form").attr("data-mode", "Update");
         $(".staff-form-header").text("Sửa nhân viên");
         Pre_populate(this);
     });
 
-    // delete click
+    // delete - click - bắt sự kiện click xóa nhân viên
     $(document).on("click", ".delete-staff-btn", function () {
         let id = $(this).attr("data-id")
         $("#modal-remove-staff").attr("data-staff-id", id);
     })
 
-    // delete confirm to delete staff
-    $(document).on("click", "#submit-remove-staff", function () {
+    // delete - confirm - bắt sự kiện xác nhận xóa nhân viên
+    $("#submit-remove-staff").on("click", function () {
         let staff_id = $(this).closest("#modal-remove-staff").attr("data-staff-id");
         Delete(staff_id);
     });
 
-    // call search when press enter while search input was focusing
+    // search - bắt sự kiện ấn "ENTER" khi người dùng đang nhập liệu
     $("#search-input").on("keyup", function (event) {
         if (event.key == "Enter") {
             SelectedPageNumber = 1;
-            $("#phongban-filter").val(-1);
             Search();
         }
     });
 
-    // change department
-    $(document).on("change", "#phongban-filter", function () {
+    // search - bắt sự kiện click tìm kiếm
+    $("#search-button").click(function () {
+        SelectedPageNumber = 1;
+        Search();
+    });
+
+    // thay đổi phòng ban
+    $("#phongban-filter").on("change", function () {
         SelectedPageNumber = 1;
         Search();
     })
 
-    // change page number
-    $(document).on("click", "#staff-pagination button", function(){
+    // thay đổi chức vụ
+    $("#chucvu-filter").on("change", function () {
+        SelectedPageNumber = 1;
+        Search();
+    })
+
+    // chuyển trang
+    $(document).on("click", "#staff-pagination button", function () {
         SelectedPageNumber = $(this).attr("id");
         Search();
     })
 
-    // call search fucntion when search button was clicked
-    $("#search-button").click(function () {
-        SelectedPageNumber = 1;
-        $("#phongban-filter").val(-1);
-        Search();
-    });
-
-    // rend the page number at the beginning of the program
+    // rend nút phân trang
     rend_page_number();
 
-    // 
-    $(".warning-popup button").on("click", function(){
-        $(".warning-popup").hide();
-    })
+    //  bắt sự kiện dismiss thông báo lỗi
+    $(".warning-popup button").on("click", ()=> $(".warning-popup").hide());
+
+    // chọn/bỏ chọn lọc
+    $(".IsFilted").on("click", Search);
 });
 
-function DisplayError(actionName, errorResponse){
-    $(".action-discription").text("Thực hiện "+ actionName +" không thành công");
-    if(errorResponse.Code == 500){
+function DisplayError(actionName, errorResponse) {
+    $(".action-discription").text("Thực hiện " + actionName + " không thành công");
+    if (errorResponse.Code == 500) {
         $(".warning-popup").show();
-    }else if(errorResponse.Code == 400){
-        $(".reason").text("Do "+errorResponse.Message);
+    } else if (errorResponse.Code == 400) {
+        $(".reason").text("Do " + errorResponse.Message);
         $(".warning-popup").show();
     }
 }
 
 function Search() {
-    // get department id
-    // get pagination number
-    // get key search
-    let _phongBanId = $("#phongban-filter").val();
-    let key = $("#search-input").val().toLowerCase();
+    let _phongBanId = -1,
+        _chucVuId = -1;
+
+    if($(".IsFilted").prop("checked")){
+        _phongBanId = $("#phongban-filter").val();
+        _chucVuId = $("#chucvu-filter").val();
+    }
+
+    let key = $("#search-input").val().trim().toLowerCase();
     let _pageSize = 8;
     $.ajax({
         url: "Staff/Search",
@@ -100,14 +108,16 @@ function Search() {
         data: {
             keySearch: key,
             phongBanId: _phongBanId,
+            chucVuId: _chucVuId,
             PageSize: _pageSize,
             PageNumber: SelectedPageNumber
         },
         success: function (response) {
-            if(response.Code == 200){
+            debugger
+            if (response.Code == 200) {
                 $("#staff-container").html(response.Data);
                 rend_page_number();
-            }else{
+            } else {
                 DisplayError("Tìm Kiếm", response)
             }
         }
@@ -120,12 +130,11 @@ function Delete(staff_id) {
     options.type = "delete";
     options.contentType = "application/json";
     $.ajax(options).done(function (response) {
-        debugger
         if (response.Code == 200) {
-            let deletedRow_element = $("#" + staff_id);
-            deletedRow_element.css("animation", "leftToRightOut 0.5s linear");
+            AddAnimation("#" + staff_id, "leftToRightOut 0.5s linear");
+
             setTimeout(function () {
-                deletedRow_element.remove()
+                $("#" + staff_id).remove()
             }, 500);
 
         } else {
@@ -134,7 +143,7 @@ function Delete(staff_id) {
     });
 }
 
-function create_or_update() {
+function create_or_update() {  
     // get form
     let staff_form = document.getElementById("staff-form");
     // display loading
@@ -163,21 +172,21 @@ function create_or_update() {
 
             if (response.Code == 200) {
                 if (mode == "Create") {
-                    $(".modal-message").text("Thêm thông tin thành công");
                     Rend_New_Staff_Row(response.Data);
                 } else if (mode == "Update") {
-                    $(".modal-message").text("Sửa thông tin thành công");
-                    Update_Existed_Staff_Row(response.Data);
+                    if (response.Data) {
+                        Update_Existed_Staff_Row();
+                    }
                 }
-            }  else if (response.Code == 400) {
+            } else if (response.Code == 400) {
                 $(".partial-create").html(response.Data);
                 $("#staff-form").attr("data-mode", mode);
-            } else{
-                DisplayError(mode=="Create" ? "Thêm":"Sửa", response)
+            } else {
+                DisplayError(mode == "Create" ? "Thêm" : "Sửa", response)
             }
         },
         error: function () {
-            alert("fail")
+            alert("Bạn đã mất kết lối với trang chủ")
         }
     });
 }
@@ -185,21 +194,22 @@ function create_or_update() {
 // export data into staff excel template
 function ExportToExcel() {
     let _phongBanId = $("#phongban-filter").val();
+    let _chucVuId = $("#chucvu-filter").val();
     let key = $("#search-input").val().toLowerCase();
-    debugger
     var options = {};
     options.url = "Staff/Report?";
     options.type = "get";
     options.contentType = "application/json";
     options.data = {
-        keySearch : key,
-        phongBanId: _phongBanId
+        keySearch: key,
+        phongBanId: _phongBanId,
+        chucVuId: _chucVuId
     };
 
     $.ajax(options).done(function (response) {
-        if(response.Code == 200){
+        if (response.Code == 200) {
             window.location.href = "Staff/Download?filePath=" + response.Data + "&fileName=BaoCaoNhanVien.xlsx";
-        }else {
+        } else {
             DisplayError("Xuất File Excel", response);
         }
     });
@@ -210,23 +220,46 @@ function Pre_populate(root) {
     let id = $(closest_row_tag).attr("id");
     let hoVaTen = $(closest_row_tag).find(".hoVaTen").text();
     let ngaySinh = DobFormatEN($(closest_row_tag).find(".ngaySinh").text());
-    let chucVu = $(closest_row_tag).find(".chucVu").text();
     let dienThoai = $(closest_row_tag).find(".dienThoai").text();
     let phongBanId = $(closest_row_tag).find(".phongBan").data("id");
+    let chucVuId = $(closest_row_tag).find(".chucVu").data("id");
 
     let staff_form = $("#staff-form");
     staff_form.find("#Id").val(id)
     staff_form.find("#HoVaTen").val(hoVaTen);
     staff_form.find("#NgaySinh").val(ngaySinh);
-    staff_form.find("#ChucVu").val(chucVu);
     staff_form.find("#DienThoai").val(dienThoai);
     staff_form.find("#phongban-selection-form").val(phongBanId);
+    staff_form.find("#chucvu-selection-form").val(chucVuId);
 }
 
-function clean_the_form() {
-    $(".modal-message").text("");
-    $("#staff-form input:not([type='date'])").val("");
+function clear_the_form() {
+    $("#staff-form input").val("");
     $(".error-holder").text("");
+}
+
+function GetStaffObj() {
+    let staff_model = {};
+
+    let staff_form = $("#staff-form");
+    staff_model.Id = staff_form.find("#Id").val();
+    staff_model.HoVaTen = staff_form.find("#HoVaTen").val();
+    staff_model.NgaySinh = staff_form.find("#NgaySinh").val();
+    staff_model.DienThoai = staff_form.find("#DienThoai").val();
+
+    let phongBan = staff_form.find("#phongban-selection-form option:selected");
+    let chucVu = staff_form.find("#chucvu-selection-form option:selected");
+
+    staff_model.PhongBan = {
+        Id: phongBan.val(),
+        TenPhongBan: phongBan.text()
+    }
+    staff_model.ChucVu = {
+        Id: chucVu.val(),
+        TenChucVu: chucVu.text()
+    }
+
+    return staff_model;
 }
 
 // rend pagination
@@ -254,8 +287,8 @@ function get_staff_row(staffObj) {
                 <td class="hoVaTen">${staffObj.HoVaTen}</td>
                 <td class="ngaySinh">${DobFormatVN(staffObj.NgaySinh)}</td>
                 <td class="dienThoai">${staffObj.DienThoai}</td>
-                <td class="chucVu">${staffObj.ChucVu}</td>
-                <td class="phongBan" data-id="${staffObj.PhongBanId}">${staffObj.PhongBan.TenPhongBan}</td>
+                <td class="phongBan" data-id="${staffObj.PhongBan.Id}">${staffObj.PhongBan.TenPhongBan}</td>
+                <td class="chucVu" data-id="${staffObj.ChucVu.Id}">${staffObj.ChucVu.TenChucVu}</td>
                 <td class="btn-area">
                     <button data-id=${staffObj.Id} class="btn bg-warning m-1 edit-staff-btn" data-toggle="modal" 
                         data-target="#modal-edit-staff">Sửa</button>
@@ -266,30 +299,64 @@ function get_staff_row(staffObj) {
 }
 
 // rend the new tr staff row
-function Rend_New_Staff_Row(staffObj) {
-    $("#staff-container").prepend(get_staff_row(staffObj));
-    $("#staff-container tr#" + staffObj.Id).css("animation", "leftToRightIn 0.15s linear");
+function Rend_New_Staff_Row(Id) {
+    let newNhanVienObj = GetStaffObj();
+    newNhanVienObj.Id = Id;
+    $("#staff-container").prepend(get_staff_row(newNhanVienObj));
+
+    var selector = "#staff-container tr#" + Id;
+    AddAnimation(selector, "leftToRightIn 0.15s linear");
+    AddCssTimeOut(selector, "border", "4px solid green", 700);
+
 }
+
 // update the changed tr staff row
-function Update_Existed_Staff_Row(staffObj) {
-    $("#staff-container #" + staffObj.Id).replaceWith(get_staff_row(staffObj));
-    $(".staff-table tr#" + staffObj.Id).css("animation", "leftToRightIn 0.15s linear");
+function Update_Existed_Staff_Row() {
+    let newNhanVienObj = GetStaffObj();
+    var newRow = get_staff_row(newNhanVienObj);
+    var selector = "#staff-container tr#" + newNhanVienObj.Id;
+    var updatedRow = $(selector);
+    updatedRow.replaceWith(newRow);
+
+    AddAnimation(selector, "leftToRightIn 0.15s linear");
+    AddCssTimeOut(selector, "border", "4px solid green", 700);
+}
+
+function AddAnimation(selector, value) {
+    $(".close").click();
+    $(selector).css("animation", value);
+}
+
+function AddCssTimeOut(selector, AttrName, value, miniSecond) {
+    if (timeOutMinisecond) {
+        setTimeout(() => {
+            $(selector).css(AttrName, value);
+        }, miniSecond);
+    }
 }
 
 function Validate() {
-    return (Validate_NgaySinh() & Validate_HoTen() & Validate_PhongBan());
+    return (Validate_NgaySinh() & Validate_HoTen() & Validate_PhongBan() & Validate_ChucVu());
 }
 
 // validate ngay sinh
 function Validate_NgaySinh() {
-    const dobInput = new Date($("#NgaySinh").val());
+    let dobInput;
+    let dobInputString = $("#NgaySinh").val();
     const currentDate = new Date();
-
-    if (dobInput >= currentDate) {
-
-        $("#DobError").html("Sinh nhật không được lớn hơn ngày tháng năm hiện tại, hãy điền ngày sinh nhật của bạn").css("color", "red");
+    if (dobInputString == "") {
+        $("#DobError").html("Ngày tháng năm sinh là yêu cầu").css("color", "red");
         return false;
-    } else if (dobInput.getFullYear() <= 1800) {
+    }
+    else {
+        dobInput = new Date($("#NgaySinh").val());
+        if (dobInput >= currentDate) {
+
+            $("#DobError").html("Sinh nhật không được lớn hơn ngày tháng năm hiện tại, hãy điền ngày sinh nhật của bạn").css("color", "red");
+            return false;
+        }
+    }
+    if (dobInput.getFullYear() <= 1800) {
 
         $("#DobError").html("Cảnh báo: Ngày sinh nhật quá xa so với ngày hiện tại").css("color", "green");
         return true;
@@ -313,12 +380,24 @@ function Validate_HoTen() {
 
 // validate department
 function Validate_PhongBan() {
-    let phongBan = $("#phongban-selection-form option:selected").text();
-    if (phongBan == "--Tất cả--") {
+    let phongBan = $("#phongban-selection-form option:selected").val();
+    if (phongBan == -1) {
         $("#phongBanError").html("Phòng ban là yêu cầu");
         return false;
     } else {
         $("#phongBanError").html("");
+        return true;
+    }
+}
+
+// validate Chuc Vu
+function Validate_ChucVu() {
+    let chucVu = $("#chucvu-selection-form option:selected").val();
+    if (chucVu == -1) {
+        $("#chucVuError").html("Chức vụ là yêu cầu");
+        return false;
+    } else {
+        $("#chucVuError").html("");
         return true;
     }
 }

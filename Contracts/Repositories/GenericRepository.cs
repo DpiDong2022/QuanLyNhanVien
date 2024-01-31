@@ -6,8 +6,8 @@ namespace BaiTap_phan3.Contracts.Repositories{
 
       public interface IGenericRepository<T>{
         Task<List<T>> GetAll();
-        Task<T> Insert(T obj);
-        Task<T> Update(T obj, object id);
+        Task<int> Insert(T obj);
+        Task<bool> Update(T obj, object id);
         Task<bool> Delete(object id);
         Task<T> GetById(object id);
     }
@@ -36,12 +36,12 @@ namespace BaiTap_phan3.Contracts.Repositories{
             return await _dbContext.GetById(id);
         }
 
-        public async Task<T> Insert(T obj)
+        public async Task<int> Insert(T obj)
         {
             return await _dbContext.Insert(obj);
         }
 
-        public async Task<T> Update(T obj, object id)
+        public async Task<bool> Update(T obj, object id)
         {
             return await _dbContext.Update(id, obj);
         }
